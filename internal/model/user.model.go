@@ -10,7 +10,8 @@ type User struct {
 	Password     string     `db:"password"`
 	PhotoProfile *string    `db:"photo_profile"`
 	Bio          *string    `db:"bio"`
-	JobPosition  *string    `db:"JobPosition"`
+	JobPosition  *string    `db:"job_position"`
+	Location     *string    `db:"location"`
 	CreatedAt    time.Time  `db:"created_at"`
 	UpdatedAt    *time.Time `db:"updated_at"`
 }

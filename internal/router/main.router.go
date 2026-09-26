@@ -10,4 +10,5 @@ func MainRouter(r *gin.Engine, db *pgxpool.Pool) {
 	r.Use(middleware.Cors)
 
 	AuthRouter(r, db)
+	UserRouter(r, db)
 }
