@@ -11,4 +11,5 @@ func MainRouter(r *gin.Engine, db *pgxpool.Pool) {
 
 	AuthRouter(r, db)
 	UserRouter(r, db)
+	CategoryRouter(r, db)
 }
