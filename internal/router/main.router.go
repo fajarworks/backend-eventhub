@@ -9,6 +9,7 @@ import (
 func MainRouter(r *gin.Engine, db *pgxpool.Pool) {
 	r.Use(middleware.Cors)
 
+	EventRouter(r, db)
 	AuthRouter(r, db)
 	UserRouter(r, db)
 	CategoryRouter(r, db)
