@@ -45,3 +45,29 @@ func (h *EventHandler) GetEvents(ctx *gin.Context) {
 		Data:    events,
 	})
 }
+
+func (h *EventHandler) JoinEvent(ctx *gin.Context) {
+	userId, _ := ctx.Get("userId")
+	eventId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, dto.Response{
+			Success: false,
+			Message: "invalid event id",
+		})
+		return
+	}
+
+	if err := h.service.JoinEvent(ctx.Request.Context(), userId.(int), eventId); err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Data:    nil,
+			Message: "server error occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Message: "user has successfully joined event",
+	})
+}

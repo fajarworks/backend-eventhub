@@ -62,3 +62,7 @@ func (s *EventService) GetEvents(ctx context.Context, categoryId int, location, 
 	}
 	return result, nil
 }
+
+func (s *EventService) JoinEvent(ctx context.Context, userId, eventId int) error {
+	return s.repo.JoinEvent(ctx, userId, eventId)
+}

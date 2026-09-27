@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/fajarworks/backend-eventhub/internal/handler"
+	"github.com/fajarworks/backend-eventhub/internal/middleware"
 	"github.com/fajarworks/backend-eventhub/internal/repository"
 	"github.com/fajarworks/backend-eventhub/internal/service"
 	"github.com/gin-gonic/gin"
@@ -15,5 +16,6 @@ func EventRouter(r *gin.Engine, db *pgxpool.Pool) {
 	eventHandler := handler.NewEventHandler(eventService)
 
 	eventRouter.GET("", eventHandler.GetEvents)
+	eventRouter.POST("/:id/join", middleware.AuthMiddleware, eventHandler.JoinEvent)
 
 }

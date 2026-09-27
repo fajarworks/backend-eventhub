@@ -134,7 +134,6 @@ func (r *EventRepo) GetCategoriesByEventId(ctx context.Context, eventId int) ([]
 		}
 		categories = append(categories, name)
 	}
-
 	return categories, rows.Err()
 }
 
@@ -145,5 +144,17 @@ func (r *EventRepo) GetEventAttendees(ctx context.Context, eventId int) (int, er
 		return 0, err
 	}
 	return attendees, nil
+
+}
+
+func (r *EventRepo) JoinEvent(ctx context.Context, userId, eventId int) error {
+	sql := "INSERT INTO user_event (user_id, event_id) VALUES ($1, $2)"
+	args := []any{userId, eventId}
+
+	_, err := r.db.Exec(ctx, sql, args...)
+	if err != nil {
+		return err
+	}
+	return nil
 
 }
