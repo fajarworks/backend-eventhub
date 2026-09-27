@@ -63,14 +63,6 @@ func (s *EventService) GetEvents(ctx context.Context, categoryId int, location, 
 	return result, nil
 }
 
-// func (s *EventService) JoinEvent(ctx context.Context, userId, eventId int) error {
-// 	return s.repo.JoinEvent(ctx, userId, eventId)
-// }
-
-// func (s *EventService) LeaveEvent(ctx context.Context, userId, eventId int) error {
-// 	return s.repo.LeaveEvent(ctx, userId, eventId)
-// }
-
 func (s *EventService) ToggleJoinEvent(ctx context.Context, userId, eventId int) (bool, error) {
 	joined, err := s.repo.IsJoinEvent(ctx, userId, eventId)
 	if err != nil {
@@ -89,4 +81,65 @@ func (s *EventService) ToggleJoinEvent(ctx context.Context, userId, eventId int)
 		return false, err
 	}
 	return true, nil
+}
+
+func (s *EventService) GetDetail(ctx context.Context, eventId int) (dto.EventResponse, error) {
+	event, err := s.repo.GetDetailEvent(ctx, eventId)
+
+	if err != nil {
+		return dto.EventResponse{}, err
+	}
+
+	attendees, err := s.repo.GetEventAttendees(ctx, eventId)
+	if err != nil {
+		return dto.EventResponse{}, err
+	}
+
+	categories, err := s.repo.GetCategoriesByEventId(ctx, eventId)
+	if err != nil {
+		return dto.EventResponse{}, err
+	}
+
+	return dto.EventResponse{
+		ID:         eventId,
+		Title:      event.Title,
+		Image:      event.Image,
+		Location:   event.Location,
+		Capacity:   event.Capacity,
+		StartTime:  event.StartTime,
+		Categories: categories,
+		Attendees:  attendees,
+	}, nil
+
+}
+
+func (s *EventService) GetUpcomingEvents(ctx context.Context) ([]dto.EventResponse, error) {
+	events, err := s.repo.GetUpcomingEvent(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+	data := make([]dto.EventResponse, 0, len(events))
+
+	for _, e := range events {
+		categories, err := s.repo.GetCategoriesByEventId(ctx, e.ID)
+		if err != nil {
+			return nil, err
+		}
+		attendees, err := s.repo.GetEventAttendees(ctx, e.ID)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, dto.EventResponse{
+			ID:         e.ID,
+			Title:      e.Title,
+			Image:      e.Image,
+			Location:   e.Location,
+			Capacity:   e.Capacity,
+			StartTime:  e.StartTime,
+			Categories: categories,
+			Attendees:  attendees,
+		})
+	}
+	return data, nil
 }

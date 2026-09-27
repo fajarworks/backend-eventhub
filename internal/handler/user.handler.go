@@ -33,13 +33,13 @@ func (h *UserHandler) GetDetailUser(ctx *gin.Context) {
 		case errors.Is(err, pgx.ErrNoRows):
 			ctx.JSON(http.StatusNotFound, dto.Response{
 				Success: false,
-				Message: "user tidak ditemukan",
+				Message: "user not found",
 			})
 		default:
 			log.Println("get detail user error:", err)
 			ctx.JSON(http.StatusInternalServerError, dto.Response{
 				Success: false,
-				Message: "terjadi kesalahan server",
+				Message: "server error occured",
 			})
 		}
 		return
@@ -58,7 +58,7 @@ func (h *UserHandler) GetDetailUser(ctx *gin.Context) {
 			Bio:          user.Bio,
 			CreatedAt:    user.CreatedAt,
 		},
-		Message: "berhasil mendapatkan data user",
+		Message: "success retrieved user data",
 	})
 
 }
@@ -71,7 +71,7 @@ func (h *UserHandler) UpdateUser(ctx *gin.Context) {
 		log.Println(err.Error())
 		ctx.JSON(http.StatusInternalServerError, dto.Response{
 			Success: false,
-			Message: "terjadi kesalahan sistem",
+			Message: "server error occured",
 		})
 		return
 	}
@@ -94,7 +94,7 @@ func (h *UserHandler) UpdateUser(ctx *gin.Context) {
 
 			ctx.JSON(http.StatusInternalServerError, dto.Response{
 				Success: false,
-				Message: "terjadi kesalahan server",
+				Message: "server error occured",
 			})
 		}
 		return
@@ -110,7 +110,7 @@ func (h *UserHandler) UpdateUser(ctx *gin.Context) {
 			Bio:          user.Bio,
 			UpdatedAt:    user.UpdatedAt,
 		},
-		Message: "berhasil update user",
+		Message: "user updated",
 	})
 
 }

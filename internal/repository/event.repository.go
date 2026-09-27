@@ -175,7 +175,7 @@ func (r *EventRepo) LeaveEvent(ctx context.Context, userId, eventId int) error {
 }
 
 func (r *EventRepo) IsJoinEvent(ctx context.Context, userId, EventId int) (bool, error) {
-	sql := `SELECT EXIST (SELECT FROM user_event WHERE user_id = $1 AND event_id = $2)`
+	sql := `SELECT EXISTS (SELECT user_id FROM user_event WHERE user_id = $1 AND event_id = $2)`
 	args := []any{userId, EventId}
 
 	var joined bool
@@ -185,4 +185,47 @@ func (r *EventRepo) IsJoinEvent(ctx context.Context, userId, EventId int) (bool,
 	}
 	return joined, nil
 
+}
+
+func (r *EventRepo) GetDetailEvent(ctx context.Context, eventId int) (model.Event, error) {
+	sql := `SELECT id, title, description, image, location, capacity, start_time, end_time FROM events WHERE id = $1`
+	args := []any{eventId}
+	var event model.Event
+	err := r.db.QueryRow(ctx, sql, args...).Scan(
+		&event.ID,
+		&event.Title,
+		&event.Description,
+		&event.Image, &event.Location,
+		&event.Capacity,
+		&event.StartTime,
+		&event.EndTime,
+	)
+	if err != nil {
+		return model.Event{}, err
+	}
+	return event, nil
+}
+
+func (r *EventRepo) GetUpcomingEvent(ctx context.Context) ([]model.Event, error) {
+	sql := `SELECT id, title, image, location, capacity, start_time, end_time
+	        FROM events
+	        WHERE start_time > NOW()
+	        ORDER BY start_time ASC`
+	rows, err := r.db.Query(ctx, sql)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var events []model.Event
+	for rows.Next() {
+		var event model.Event
+		if err := rows.Scan(
+			&event.ID, &event.Title, &event.Image, &event.Location,
+			&event.Capacity, &event.StartTime, &event.EndTime,
+		); err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+	return events, nil
 }

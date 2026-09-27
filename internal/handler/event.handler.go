@@ -76,7 +76,7 @@ func (h *EventHandler) ToggleJoinEvent(ctx *gin.Context) {
 
 	message := "user left event successfully"
 	if isJoined {
-		message = "user left event successfully"
+		message = "user join event successfully"
 	}
 
 	ctx.JSON(http.StatusOK, dto.Response{
@@ -85,6 +85,53 @@ func (h *EventHandler) ToggleJoinEvent(ctx *gin.Context) {
 			"is_Joined": isJoined,
 		},
 		Message: message,
+	})
+
+}
+
+func (h *EventHandler) GetEventDetail(ctx *gin.Context) {
+	eventId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusBadRequest, dto.Response{
+			Success: false,
+			Message: "invalid event id",
+		})
+		return
+	}
+	event, err := h.service.GetDetail(ctx.Request.Context(), eventId)
+
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Data:    nil,
+			Message: "server error occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Data:    event,
+		Message: "successfully retrieved event detail",
+	})
+
+}
+
+func (h *EventHandler) UpcomingEvent(ctx *gin.Context) {
+	events, err := h.service.GetUpcomingEvents(ctx)
+	if err != nil {
+		log.Println()
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Message: "server error occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Data:    events,
+		Message: "successfully get upcoming events",
 	})
 
 }
