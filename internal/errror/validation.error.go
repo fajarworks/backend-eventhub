@@ -9,6 +9,6 @@ var (
 	ErrInvalidEmailFormat = errors.New("Invalid Email Format")
 	ErrAlreadyExist       = errors.New("Email already exist")
 	ErrWrongEmailPass     = errors.New("Wrong email or password")
-	ErrFileFormat         = errors.New("format foto harus jpg/jpeg/png")
-	ErrFileSize           = errors.New("ukuran foto maksimal 2mb")
+	ErrFileFormat         = errors.New("image format must be jpg/jpeg/png")
+	ErrFileSize           = errors.New("image max size 2mb")
 )

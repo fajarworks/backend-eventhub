@@ -25,13 +25,13 @@ func (h *CategoryHandler) GetCategories(ctx *gin.Context) {
 		log.Println(err.Error())
 		ctx.JSON(http.StatusInternalServerError, dto.Response{
 			Success: false,
-			Message: "terjadi kesalahan server",
+			Message: "server error occured",
 		})
 		return
 	}
 	ctx.JSON(http.StatusOK, dto.Response{
 		Success: true,
 		Data:    categories,
-		Message: "berhasil mendapatkan data category",
+		Message: "successfully retrieved categories data",
 	})
 }
