@@ -30,13 +30,13 @@ func (h *UserHandler) GetDetailUser(ctx *gin.Context) {
 		switch {
 		case errors.Is(err, pgx.ErrNoRows):
 			ctx.JSON(http.StatusNotFound, dto.Response{
-				Status:  false,
+				Success: false,
 				Message: "user tidak ditemukan",
 			})
 		default:
 			log.Println("get me error:", err)
 			ctx.JSON(http.StatusInternalServerError, dto.Response{
-				Status:  false,
+				Success: false,
 				Message: "terjadi kesalahan server",
 			})
 		}
@@ -44,7 +44,7 @@ func (h *UserHandler) GetDetailUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.Response{
-		Status: true,
+		Success: true,
 		Data: dto.UserResponse{
 			Id:           user.Id,
 			Role:         user.Role,

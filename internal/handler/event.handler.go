@@ -33,14 +33,14 @@ func (h *EventHandler) GetEvents(ctx *gin.Context) {
 	if err != nil {
 		log.Println("get events error:", err)
 		ctx.JSON(http.StatusInternalServerError, dto.Response{
-			Status:  false,
+			Success: false,
 			Message: "terjadi kesalahan server",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, dto.Response{
-		Status:  true,
+		Success: true,
 		Message: "berhasil mendapatkan data event",
 		Data:    events,
 	})

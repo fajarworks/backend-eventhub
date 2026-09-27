@@ -30,7 +30,7 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 		log.Println("bind error:", err)
 
 		ctx.JSON(http.StatusBadRequest, dto.Response{
-			Status:  false,
+			Success: false,
 			Message: "request body tidak valid",
 		})
 		return
@@ -42,25 +42,25 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 		switch {
 		case errors.Is(err, apperror.ErrEmptyField):
 			ctx.JSON(http.StatusBadRequest, dto.Response{
-				Status:  false,
+				Success: false,
 				Message: err.Error(),
 			})
 
 		case errors.Is(err, apperror.ErrInvalidEmailFormat):
 			ctx.JSON(http.StatusBadRequest, dto.Response{
-				Status:  false,
+				Success: false,
 				Message: err.Error(),
 			})
 
 		case errors.Is(err, apperror.ErrAlreadyExist):
 			ctx.JSON(http.StatusConflict, dto.Response{
-				Status:  false,
+				Success: false,
 				Message: err.Error(),
 			})
 
 		default:
 			ctx.JSON(http.StatusInternalServerError, dto.Response{
-				Status:  false,
+				Success: false,
 				Message: err.Error(),
 			})
 		}
@@ -69,7 +69,7 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, dto.Response{
-		Status:  true,
+		Success: true,
 		Message: "user created",
 	})
 }
@@ -80,7 +80,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 	if err := ctx.ShouldBindWith(&body, binding.JSON); err != nil {
 		log.Println(err.Error())
 		ctx.JSON(http.StatusInternalServerError, dto.Response{
-			Status:  false,
+			Success: false,
 			Message: "terjadi kesalahan server",
 		})
 		return
@@ -92,18 +92,18 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 
 		case errors.Is(err, apperror.ErrEmptyField):
 			ctx.JSON(http.StatusBadRequest, dto.Response{
-				Status:  false,
+				Success: false,
 				Message: err.Error(),
 			})
 		case errors.Is(err, apperror.ErrWrongEmailPass):
 			ctx.JSON(http.StatusUnauthorized, dto.Response{
-				Status:  false,
+				Success: false,
 				Message: err.Error(),
 			})
 		default:
 			log.Println(err.Error())
 			ctx.JSON(http.StatusInternalServerError, dto.Response{
-				Status:  false,
+				Success: false,
 				Data:    "",
 				Message: "terjadi kesalahan server",
 			})
@@ -111,7 +111,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusAccepted, dto.Response{
-		Status:  true,
+		Success: true,
 		Data:    token,
 		Message: "user berhasil login",
 	})

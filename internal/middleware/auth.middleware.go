@@ -16,7 +16,7 @@ func AuthMiddleware(ctx *gin.Context) {
 
 	if bearer == "" {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, dto.Response{
-			Status:  false,
+			Success: false,
 			Message: "please login first",
 		})
 		return
@@ -25,14 +25,14 @@ func AuthMiddleware(ctx *gin.Context) {
 	result := strings.Split(bearer, " ")
 	if len(result) != 2 {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, dto.Response{
-			Status:  false,
+			Success: false,
 			Message: "invalid bearer token",
 		})
 		return
 	}
 	if result[0] != "Bearer" {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, dto.Response{
-			Status:  false,
+			Success: false,
 			Message: "invalid bearer token",
 		})
 		return
@@ -42,13 +42,13 @@ func AuthMiddleware(ctx *gin.Context) {
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) || errors.Is(err, jwt.ErrTokenInvalidIssuer) {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, dto.Response{
-				Status:  false,
+				Success: false,
 				Message: "invalid token",
 			})
 			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, dto.Response{
-			Status:  false,
+			Success: false,
 			Message: "terjadi kesalahan server",
 		})
 		return
