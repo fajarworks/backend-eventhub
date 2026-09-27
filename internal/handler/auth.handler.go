@@ -25,13 +25,12 @@ func NewAuthHandler(service *service.AuthService) *AuthHandler {
 func (h *AuthHandler) Register(ctx *gin.Context) {
 	var body dto.RegisterRequest
 
-	// Binding JSON
 	if err := ctx.ShouldBindBodyWith(&body, binding.JSON); err != nil {
 		log.Println("bind error:", err)
 
 		ctx.JSON(http.StatusBadRequest, dto.Response{
 			Success: false,
-			Message: "request body tidak valid",
+			Message: "invalid request body",
 		})
 		return
 	}
@@ -81,7 +80,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		log.Println(err.Error())
 		ctx.JSON(http.StatusInternalServerError, dto.Response{
 			Success: false,
-			Message: "terjadi kesalahan server",
+			Message: "server error occured",
 		})
 		return
 	}
@@ -105,7 +104,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, dto.Response{
 				Success: false,
 				Data:    "",
-				Message: "terjadi kesalahan server",
+				Message: "server error occured",
 			})
 		}
 		return
@@ -113,7 +112,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, dto.Response{
 		Success: true,
 		Data:    token,
-		Message: "user berhasil login",
+		Message: "user login successfully",
 	})
 
 }
