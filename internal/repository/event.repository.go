@@ -229,3 +229,27 @@ func (r *EventRepo) GetUpcomingEvent(ctx context.Context) ([]model.Event, error)
 	}
 	return events, nil
 }
+
+func (r *EventRepo) GetEventsByUserId(ctx context.Context, userId int) ([]model.Event, error) {
+	sql := `SELECT e.id, e.title, e.image, e.location, e.capacity, e.start_time, e.end_time
+	        FROM events e
+	        JOIN user_event ue ON ue.event_id = e.id
+	        WHERE ue.user_id = $1
+	        ORDER BY e.start_time ASC`
+	rows, err := r.db.Query(ctx, sql, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var events []model.Event
+
+	for rows.Next() {
+		var event model.Event
+		if err := rows.Scan(&event.ID, &event.Title, &event.Image, &event.Location,
+			&event.Capacity, &event.StartTime, &event.EndTime); err != nil {
+
+		}
+		events = append(events, event)
+	}
+	return events, nil
+}

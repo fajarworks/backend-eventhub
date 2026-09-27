@@ -135,3 +135,30 @@ func (h *EventHandler) UpcomingEvent(ctx *gin.Context) {
 	})
 
 }
+
+func (h *EventHandler) GetEventsByUserId(ctx *gin.Context) {
+	userId, exist := ctx.Get("userId")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, dto.Response{
+			Success: false,
+			Message: "unauthorized",
+		})
+		return
+	}
+	events, err := h.service.GetEventsByUserId(ctx, userId.(int))
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Message: "server error occured",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Data:    events,
+		Message: "successfully retrieved events by user id",
+	})
+
+}

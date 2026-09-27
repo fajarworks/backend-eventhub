@@ -143,3 +143,33 @@ func (s *EventService) GetUpcomingEvents(ctx context.Context) ([]dto.EventRespon
 	}
 	return data, nil
 }
+
+func (s *EventService) GetEventsByUserId(ctx context.Context, userId int) ([]dto.EventResponse, error) {
+	events, err := s.repo.GetEventsByUserId(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	data := make([]dto.EventResponse, 0, len(events))
+
+	for _, e := range events {
+		categories, err := s.repo.GetCategoriesByEventId(ctx, e.ID)
+		if err != nil {
+			return nil, err
+		}
+		attendees, err := s.repo.GetEventAttendees(ctx, e.ID)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, dto.EventResponse{
+			ID:         e.ID,
+			Title:      e.Title,
+			Image:      e.Image,
+			Location:   e.Location,
+			Capacity:   e.Capacity,
+			StartTime:  e.StartTime,
+			Categories: categories,
+			Attendees:  attendees,
+		})
+	}
+	return data, nil
+}
