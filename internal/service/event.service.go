@@ -63,6 +63,30 @@ func (s *EventService) GetEvents(ctx context.Context, categoryId int, location, 
 	return result, nil
 }
 
-func (s *EventService) JoinEvent(ctx context.Context, userId, eventId int) error {
-	return s.repo.JoinEvent(ctx, userId, eventId)
+// func (s *EventService) JoinEvent(ctx context.Context, userId, eventId int) error {
+// 	return s.repo.JoinEvent(ctx, userId, eventId)
+// }
+
+// func (s *EventService) LeaveEvent(ctx context.Context, userId, eventId int) error {
+// 	return s.repo.LeaveEvent(ctx, userId, eventId)
+// }
+
+func (s *EventService) ToggleJoinEvent(ctx context.Context, userId, eventId int) (bool, error) {
+	joined, err := s.repo.IsJoinEvent(ctx, userId, eventId)
+	if err != nil {
+		return false, err
+	}
+
+	if joined {
+		if err := s.repo.LeaveEvent(ctx, userId, eventId); err != nil {
+			return false, err
+
+		}
+		return false, nil
+	}
+
+	if err := s.repo.JoinEvent(ctx, userId, eventId); err != nil {
+		return false, err
+	}
+	return true, nil
 }

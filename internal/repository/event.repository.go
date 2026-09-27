@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 
+	apperror "github.com/fajarworks/backend-eventhub/internal/errror"
 	"github.com/fajarworks/backend-eventhub/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -156,5 +157,32 @@ func (r *EventRepo) JoinEvent(ctx context.Context, userId, eventId int) error {
 		return err
 	}
 	return nil
+
+}
+
+func (r *EventRepo) LeaveEvent(ctx context.Context, userId, eventId int) error {
+	sql := "DELETE FROM user_event WHERE user_id = $1 AND event_id = $2 "
+	args := []any{userId, eventId}
+
+	cmdTag, err := r.db.Exec(ctx, sql, args...)
+	if err != nil {
+		return err
+	}
+	if cmdTag.RowsAffected() == 0 {
+		return apperror.ErrNoRowsAffected
+	}
+	return nil
+}
+
+func (r *EventRepo) IsJoinEvent(ctx context.Context, userId, EventId int) (bool, error) {
+	sql := `SELECT EXIST (SELECT FROM user_event WHERE user_id = $1 AND event_id = $2)`
+	args := []any{userId, EventId}
+
+	var joined bool
+	err := r.db.QueryRow(ctx, sql, args...).Scan(&joined)
+	if err != nil {
+		return joined, err
+	}
+	return joined, nil
 
 }
