@@ -1,3 +1,5 @@
 .env
 /tmp
 .air.toml
+
+/public
