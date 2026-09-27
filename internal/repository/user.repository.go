@@ -36,3 +36,21 @@ func (r *UserRepo) FindUserById(ctx context.Context, id int) (model.User, error)
 	}
 	return data, nil
 }
+
+func (r *UserRepo) UpdateProfile(ctx context.Context, userId int, photoProfile, fullName, location, jobPosition, bio *string) (model.User, error) {
+	sql := `UPDATE users 
+	SET photo_profile = COALESCE ($1, photo_profile) ,
+	fullname = COALESCE($2, fullname), 
+	location = COALESCE ($3, location), job_position = COALESCE($4, job_position),
+	bio = COALESCE ($5, bio),
+	updated_at = NOW()
+	WHERE id = $6
+	RETURNING id, photo_profile, fullname, location, bio, updated_at`
+
+	var user model.User
+	err := r.db.QueryRow(ctx, sql, photoProfile, fullName, location, jobPosition, bio, userId).Scan(&user.Id, &user.PhotoProfile, &user.Fullname, &user.Location, &user.Bio, &user.UpdatedAt)
+	if err != nil {
+		return model.User{}, err
+	}
+	return user, nil
+}

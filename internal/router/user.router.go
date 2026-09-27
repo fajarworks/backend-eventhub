@@ -1,6 +1,8 @@
 package router
 
 import (
+	"path"
+
 	"github.com/fajarworks/backend-eventhub/internal/handler"
 	"github.com/fajarworks/backend-eventhub/internal/middleware"
 	"github.com/fajarworks/backend-eventhub/internal/repository"
@@ -15,6 +17,7 @@ func UserRouter(r *gin.Engine, db *pgxpool.Pool) {
 	userRepo := repository.NewUserRepo(db)
 	userService := service.NewUserRepo(userRepo)
 	userHandler := handler.NewUserHandler(userService)
-
+	r.Static("images", path.Join("public", "images"))
 	userRouter.GET("/detail", userHandler.GetDetailUser)
+	userRouter.PATCH("/update", userHandler.UpdateUser)
 }
