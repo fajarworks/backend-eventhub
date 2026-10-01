@@ -11,4 +11,5 @@ var (
 	ErrWrongEmailPass     = errors.New("Wrong email or password")
 	ErrFileFormat         = errors.New("image format must be jpg/jpeg/png")
 	ErrFileSize           = errors.New("image max size 2mb")
+	ErrWrongPass          = errors.New("password lama salah")
 )

@@ -21,4 +21,5 @@ func UserRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 	r.Static("images", path.Join("public", "images"))
 	userRouter.GET("/detail", userHandler.GetDetailUser)
 	userRouter.PATCH("/update", userHandler.UpdateUser)
+	userRouter.POST("/change-password", userHandler.ChangePassword)
 }

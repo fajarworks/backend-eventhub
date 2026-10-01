@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	apperror "github.com/fajarworks/backend-eventhub/internal/errror"
 	"github.com/fajarworks/backend-eventhub/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -53,4 +54,19 @@ func (r *UserRepo) UpdateProfile(ctx context.Context, userId int, photoProfile, 
 		return model.User{}, err
 	}
 	return user, nil
+}
+
+func (r *UserRepo) ChangePassword(ctx context.Context, userId int, password string) error {
+	sql := `UPDATE users
+	set password = $1
+	WHERE id = $2`
+	args := []any{password, userId}
+	cmdTag, err := r.db.Exec(ctx, sql, args...)
+	if err != nil {
+		return err
+	}
+	if cmdTag.RowsAffected() == 0 {
+		return apperror.ErrNoRowsAffected
+	}
+	return nil
 }

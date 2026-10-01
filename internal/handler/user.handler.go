@@ -130,3 +130,45 @@ func (h *UserHandler) UpdateUser(ctx *gin.Context) {
 	})
 
 }
+
+func (h *UserHandler) ChangePassword(ctx *gin.Context) {
+	userId, exist := ctx.Get("userId")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, dto.Response{
+			Success: false,
+			Message: "unauthorized",
+		})
+	}
+	var body dto.ChangePassword
+	if err := ctx.ShouldBindWith(&body, binding.JSON); err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Message: "server error occured",
+		})
+		return
+	}
+	err := h.service.ChangePassword(ctx, userId.(int), body.OldPassword, body.NewPassword)
+	if err != nil {
+		switch {
+		case errors.Is(err, apperror.ErrWrongPass):
+			log.Println(err.Error())
+			ctx.JSON(http.StatusBadRequest, dto.Response{
+				Success: false,
+				Message: "wrong old password",
+			})
+		case errors.Is(err, apperror.ErrEmptyField):
+			log.Println(err.Error())
+			ctx.JSON(http.StatusBadRequest, dto.Response{
+				Success: false,
+				Message: "field can't be empty",
+			})
+		}
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: false,
+		Message: "success change password",
+	})
+
+}

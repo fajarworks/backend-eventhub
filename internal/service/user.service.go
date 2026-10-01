@@ -16,6 +16,7 @@ import (
 	"github.com/fajarworks/backend-eventhub/internal/dto"
 	apperror "github.com/fajarworks/backend-eventhub/internal/errror"
 	"github.com/fajarworks/backend-eventhub/internal/model"
+	"github.com/fajarworks/backend-eventhub/internal/pkg"
 	"github.com/fajarworks/backend-eventhub/internal/repository"
 	"github.com/redis/go-redis/v9"
 )
@@ -103,4 +104,26 @@ func (s *UserService) UpdateProfile(ctx context.Context, userId int, req dto.Upd
 		return model.User{}, err
 	}
 	return dataUser, nil
+}
+
+func (r *UserService) ChangePassword(ctx context.Context, userId int, oldPassword, newPassword string) error {
+	if err := pkg.ValidateLengthPass(newPassword); err != nil {
+		return err
+	}
+
+	user, err := r.repo.FindUserById(ctx, userId)
+	if err != nil {
+		return err
+	}
+
+	if err := pkg.ComparePassAndHash(oldPassword, user.Password); err != nil {
+		return apperror.ErrWrongPass
+	}
+	hashConf := pkg.NewRecomHashConfig()
+	pass, err := hashConf.GenHash(newPassword)
+	if err != nil {
+		return err
+	}
+	return r.repo.ChangePassword(ctx, userId, pass)
+
 }
