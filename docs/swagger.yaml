@@ -1,0 +1,134 @@
+basePath: /
+definitions:
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: boolean
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  description: Aplication for eventhub API
+  title: Eventhub
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: login to access all features app
+      parameters:
+      - description: login woi
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Login to authentication
+      tags:
+      - Auth
+  /events/{id}:
+    get:
+      description: get a detail information of an event
+      parameters:
+      - description: event ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: retrieves an event detail
+      tags:
+      - Events
+  /user/update:
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Update information user
+      parameters:
+      - description: Profile photo
+        in: formData
+        name: photo_profile
+        type: file
+      - description: Full name
+        in: formData
+        name: fullname
+        type: string
+      - description: Job position
+        in: formData
+        name: job_position
+        type: string
+      - description: Location
+        in: formData
+        name: location
+        type: string
+      - description: Bio
+        in: formData
+        name: bio
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      security:
+      - BearerAuth: []
+      summary: Update User Information
+      tags:
+      - User
+securityDefinitions:
+  BearerToken:
+    description: Bearer token used as identiity for accessing backend
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
