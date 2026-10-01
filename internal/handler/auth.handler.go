@@ -22,6 +22,18 @@ func NewAuthHandler(service *service.AuthService) *AuthHandler {
 	}
 }
 
+// Login
+// @Summary			Login to authentication
+// @Description		login to access all features app
+// @Tags			Auth
+// @Accept       	json
+// @Produce      	json
+// @param			data	body	dto.LoginRequest	true "login woi"
+// @success 		200 {object} dto.Response
+// @failure			400 {object} dto.Response
+// @failure			409 {object} dto.Response
+// @failure			500 {object} dto.Response
+// @router			/auth/login [post]
 func (h *AuthHandler) Register(ctx *gin.Context) {
 	var body dto.RegisterRequest
 
@@ -109,7 +121,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		}
 		return
 	}
-	ctx.JSON(http.StatusAccepted, dto.Response{
+	ctx.JSON(http.StatusOK, dto.Response{
 		Success: true,
 		Data:    token,
 		Message: "user login successfully",

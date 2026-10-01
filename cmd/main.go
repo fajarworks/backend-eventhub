@@ -8,10 +8,21 @@ import (
 
 	"github.com/fajarworks/backend-eventhub/internal/config"
 	"github.com/fajarworks/backend-eventhub/internal/router"
-
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
+
+// @title           			Eventhub
+// @version         			1.0
+// @description     			Aplication for eventhub API
+// @host      					localhost:8081
+
+// @BasePath  					/
+
+// @securityDefinitions.apikey 	BearerToken
+// @in 							header
+// @name 						Authorization
+// @description 				Bearer token used as identiity for accessing backend
 
 func main() {
 

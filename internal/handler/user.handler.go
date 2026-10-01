@@ -63,6 +63,22 @@ func (h *UserHandler) GetDetailUser(ctx *gin.Context) {
 
 }
 
+// UpdateUser
+// @Summary Update User Information
+// @Description Update information user
+// @Tags User
+// @Accept mpfd
+// @Produce json
+// @Security BearerAuth
+// @Param photo_profile formData file false "Profile photo"
+// @Param fullname formData string false "Full name"
+// @Param job_position formData string false "Job position"
+// @Param location formData string false "Location"
+// @Param bio formData string false "Bio"
+// @Success 200 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Failure 500 {object} dto.Response
+// @Router /user/update [patch]
 func (h *UserHandler) UpdateUser(ctx *gin.Context) {
 	userId, _ := ctx.Get("userId")
 	var updateUserReq dto.UpdateProfileRequest

@@ -89,6 +89,15 @@ func (h *EventHandler) ToggleJoinEvent(ctx *gin.Context) {
 
 }
 
+// Detail Event
+// @Summary			retrieves an event detail
+// @description		get a detail information of an event
+// @tags			Events
+// @produce			json
+// @param			id path int	true "event ID"
+// @success			200 {object}	dto.Response
+// @failure			500 {object}	dto.Response
+// @router			/events/{id}	[get]
 func (h *EventHandler) GetEventDetail(ctx *gin.Context) {
 	eventId, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
