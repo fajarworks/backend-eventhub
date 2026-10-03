@@ -77,3 +77,24 @@ func (s *CommunityService) LeaveCommunity(ctx context.Context, userId, comId int
 
 	return nil
 }
+
+func (s *CommunityService) GetPopularCommunity(ctx context.Context) ([]dto.PopularCommunities, error) {
+	com, err := s.repo.GetPopularCommunity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var communities []dto.PopularCommunities
+	for _, v := range com {
+		communities = append(communities, dto.PopularCommunities{
+			ID:             v.ID,
+			Name:           v.Name,
+			Image:          v.Image,
+			Categories:     v.Categories,
+			UpcomingEvents: v.UpcomingEvents,
+			Members:        v.Members,
+			CreatedAt:      v.CreatedAt,
+			UpdatedAt:      v.UpdatedAt,
+		})
+	}
+	return communities, nil
+}

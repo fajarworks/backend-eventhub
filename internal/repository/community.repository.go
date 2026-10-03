@@ -110,3 +110,38 @@ func (r *CommunityRepo) LeaveCommunity(ctx context.Context, userId, comId int) e
 	}
 	return nil
 }
+
+func (r *CommunityRepo) GetPopularCommunity(ctx context.Context) ([]model.PopularCommunities, error) {
+	sql := `SELECT
+		communities.id,
+		communities.name,
+		communities.image,
+		ARRAY_AGG(DISTINCT categories.name) AS categories,
+		COUNT(DISTINCT user_community.user_id) AS members_count,
+		COUNT(DISTINCT events.id) AS upcoming_events_count
+	FROM communities
+	LEFT JOIN community_category ON communities.id = community_category.community_id
+	LEFT JOIN categories ON categories.id = community_category.category_id
+	LEFT JOIN user_community ON communities.id = user_community.community_id
+	LEFT JOIN events ON events.community_id = communities.id AND events.start_time >= now()
+	GROUP BY communities.id
+	ORDER BY members_count DESC
+	LIMIT 3`
+	rows, err := r.db.Query(ctx, sql)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var communities []model.PopularCommunities
+	for rows.Next() {
+		var community model.PopularCommunities
+
+		err := rows.Scan(&community.ID, &community.Name, &community.Image, &community.Categories, &community.Members, &community.UpcomingEvents)
+		if err != nil {
+			return nil, err
+
+		}
+		communities = append(communities, community)
+	}
+	return communities, nil
+}

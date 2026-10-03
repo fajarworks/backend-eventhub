@@ -169,3 +169,29 @@ func (h *CommunityHandler) LeaveCommunity(ctx *gin.Context) {
 		Message: "user leave community successfully",
 	})
 }
+
+// PopularCommunity  godoc
+//
+// @Description  Get Most Popular Communities
+// @Tags         Community
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Router       /communities/popular [get]
+// @Success      200 {object} dto.Response
+// @Failure      500 {object} dto.Response
+func (h *CommunityHandler) GetPopularCommunity(ctx *gin.Context) {
+	communities, err := h.service.GetPopularCommunity(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Message: "server error occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Data:    communities,
+		Message: "popular communities retrieved successfully",
+	})
+}
