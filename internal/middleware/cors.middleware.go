@@ -8,7 +8,7 @@ import (
 )
 
 func Cors(ctx *gin.Context) {
-	allowedOrigins := []string{"http://localhost:5501", "http://localhost:5500"}
+	allowedOrigins := []string{"http://localhost:5501", "http://localhost:5500", "http://localhost:8081"}
 	if slices.Contains(allowedOrigins, ctx.GetHeader("Origin")) {
 		ctx.Header("Access-Control-Allow-Origin", ctx.GetHeader("Origin"))
 	}

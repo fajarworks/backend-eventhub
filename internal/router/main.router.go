@@ -20,4 +20,5 @@ func MainRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 	UserRouter(r, db, rdb)
 	CategoryRouter(r, db)
 	CommunityRouter(r, db)
+	TestimonyRouter(r, db)
 }
