@@ -55,5 +55,6 @@ func AuthMiddleware(ctx *gin.Context) {
 
 	}
 	ctx.Set("userId", token.Id)
+	ctx.Set("role", token.Role)
 	ctx.Next()
 }
