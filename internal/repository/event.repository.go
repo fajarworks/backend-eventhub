@@ -265,3 +265,15 @@ func (r *EventRepo) SaveEvent(ctx context.Context, userId, eventId int) error {
 	}
 	return nil
 }
+
+func (r *EventRepo) RemoveSavedEvent(ctx context.Context, userId, eventId int) error {
+	sql := `DELETE FROM user_saved_event WHERE user_id = $1 AND event_id = $2`
+	cmdTag, err := r.db.Exec(ctx, sql, userId, eventId)
+	if err != nil {
+		return err
+	}
+	if cmdTag.RowsAffected() == 0 {
+		return apperror.ErrNoRowsAffected
+	}
+	return nil
+}

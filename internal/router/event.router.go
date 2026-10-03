@@ -21,5 +21,6 @@ func EventRouter(r *gin.Engine, db *pgxpool.Pool) {
 	eventRouter.GET("/upcoming", eventHandler.UpcomingEvent)
 	eventRouter.GET("/my-events", middleware.AuthMiddleware, eventHandler.GetEventsByUserId)
 	eventRouter.POST("/:id/save", middleware.AuthMiddleware, eventHandler.SaveEvent)
+	eventRouter.DELETE("/:id/remove", middleware.AuthMiddleware, eventHandler.RemoveSavedEvent)
 
 }

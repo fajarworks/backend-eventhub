@@ -181,3 +181,11 @@ func (s *EventService) SaveEvent(ctx context.Context, userId, eventId int) error
 	}
 	return nil
 }
+
+func (s *EventService) RemoveSavedEvent(ctx context.Context, userId, eventId int) error {
+	err := s.repo.RemoveSavedEvent(ctx, userId, eventId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
