@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	apperror "github.com/fajarworks/backend-eventhub/internal/errror"
 	"github.com/fajarworks/backend-eventhub/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -84,4 +85,16 @@ func (r *CommunityRepo) GetCommunityMembers(ctx context.Context, comId int) ([]m
 
 	}
 	return members, nil
+}
+
+func (r *CommunityRepo) JoinCommunity(ctx context.Context, userId, comId int) error {
+	sql := `INSERT INTO user_community (user_id, community_id) VALUES($1, $2)`
+	cmdTag, err := r.db.Exec(ctx, sql, userId, comId)
+	if err != nil {
+		return err
+	}
+	if cmdTag.RowsAffected() == 0 {
+		return apperror.ErrNoRowsAffected
+	}
+	return nil
 }

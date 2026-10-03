@@ -78,3 +78,49 @@ func (h *CommunityHandler) GetCommunityMembers(ctx *gin.Context) {
 		Message: "success retrieved community members",
 	})
 }
+
+// JoinCommunity godoc
+//
+// @Summary      Join a community
+// @Description  Allows the authenticated user to join a community
+// @Tags         Community
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "Community ID"
+// @Security     BearerAuth
+// @Router       /communities/{id}/join [post]
+// @Success      200 {object} dto.Response
+// @Failure      400 {object} dto.Response
+// @Failure      401 {object} dto.Response
+func (h *CommunityHandler) JoinCommunity(ctx *gin.Context) {
+	userId, exist := ctx.Get("userId")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, dto.Response{
+			Success: false,
+			Message: "please login first",
+		})
+		return
+	}
+	comId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusBadRequest, dto.Response{
+			Success: false,
+			Message: "wrong community id",
+		})
+		return
+	}
+	if err := h.service.JoinCommunity(ctx.Request.Context(), userId.(int), comId); err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusBadRequest, dto.Response{
+			Success: false,
+			Message: "failed to join community",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Message: "user join event successfully",
+	})
+
+}

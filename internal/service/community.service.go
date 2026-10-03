@@ -59,3 +59,12 @@ func (s *CommunityService) GetCommunityMembers(ctx context.Context, comId int) (
 	}
 	return members, err
 }
+
+func (s *CommunityService) JoinCommunity(ctx context.Context, userId, comId int) error {
+	err := s.repo.JoinCommunity(ctx, userId, comId)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
