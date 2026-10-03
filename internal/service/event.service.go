@@ -173,3 +173,11 @@ func (s *EventService) GetEventsByUserId(ctx context.Context, userId int) ([]dto
 	}
 	return data, nil
 }
+
+func (s *EventService) SaveEvent(ctx context.Context, userId, eventId int) error {
+	err := s.repo.SaveEvent(ctx, userId, eventId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

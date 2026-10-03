@@ -20,5 +20,6 @@ func EventRouter(r *gin.Engine, db *pgxpool.Pool) {
 	eventRouter.POST("/:id/toggle-event", middleware.AuthMiddleware, eventHandler.ToggleJoinEvent)
 	eventRouter.GET("/upcoming", eventHandler.UpcomingEvent)
 	eventRouter.GET("/my-events", middleware.AuthMiddleware, eventHandler.GetEventsByUserId)
+	eventRouter.POST("/:id/save", middleware.AuthMiddleware, eventHandler.SaveEvent)
 
 }

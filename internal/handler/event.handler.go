@@ -171,3 +171,49 @@ func (h *EventHandler) GetEventsByUserId(ctx *gin.Context) {
 	})
 
 }
+
+// JoinCommunity godoc
+//
+// @Summary      saved an event
+// @Description  Allows the authenticated user to save an event
+// @Tags         Events
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "Event ID"
+// @Security     BearerAuth
+// @Router       /events/{id}/save [post]
+// @Success      200 {object} dto.Response
+// @Failure      400 {object} dto.Response
+// @Failure      401 {object} dto.Response
+func (h *EventHandler) SaveEvent(ctx *gin.Context) {
+	userId, exist := ctx.Get("userId")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, dto.Response{
+			Success: false,
+			Message: "unauthorized",
+		})
+		return
+	}
+
+	eventId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusBadRequest, dto.Response{
+			Success: false,
+			Message: "wrong event id",
+		})
+		return
+	}
+
+	if err := h.service.SaveEvent(ctx.Request.Context(), userId.(int), eventId); err != nil {
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Message: "server error occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Message: "user save event successfully",
+	})
+}

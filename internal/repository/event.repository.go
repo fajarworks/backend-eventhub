@@ -253,3 +253,15 @@ func (r *EventRepo) GetEventsByUserId(ctx context.Context, userId int) ([]model.
 	}
 	return events, nil
 }
+
+func (r *EventRepo) SaveEvent(ctx context.Context, userId, eventId int) error {
+	sql := `INSERT INTO user_saved_event (user_id, event_id) VALUES ($1, $2)`
+	cmdTag, err := r.db.Exec(ctx, sql, userId, eventId)
+	if err != nil {
+		return err
+	}
+	if cmdTag.RowsAffected() == 0 {
+		return apperror.ErrNoRowsAffected
+	}
+	return nil
+}
