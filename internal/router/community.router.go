@@ -14,7 +14,7 @@ func CommunityRouter(r *gin.Engine, db *pgxpool.Pool) {
 	comRepo := repository.NewCommunityRepo(db)
 	comService := service.NewCommunityService(comRepo)
 	comHandler := handler.NewCommunityHandler(comService)
-
 	comRouter.GET("/:id", comHandler.GetDetailCommunity)
+	comRouter.GET("/:id/members", comHandler.GetCommunityMembers)
 
 }

@@ -42,3 +42,20 @@ func (s *CommunityService) GetDetailCommunity(ctx context.Context, comId int) (d
 	}, err
 
 }
+
+func (s *CommunityService) GetCommunityMembers(ctx context.Context, comId int) ([]dto.CommunityMembers, error) {
+	data, err := s.repo.GetCommunityMembers(ctx, comId)
+	members := make([]dto.CommunityMembers, 0, len(data))
+	if err != nil {
+		return nil, err
+	}
+	for _, member := range data {
+		members = append(members, dto.CommunityMembers{
+			ID:           member.ID,
+			Name:         member.FullName,
+			PhotoProfile: member.PhotoProfile,
+			JobPosition:  member.JobPosition,
+		})
+	}
+	return members, err
+}

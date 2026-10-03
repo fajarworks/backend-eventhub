@@ -59,3 +59,29 @@ func (r *CommunityRepo) GetCategoriesByCommunityId(ctx context.Context, comId in
 	}
 	return categories, rows.Err()
 }
+
+func (r *CommunityRepo) GetCommunityMembers(ctx context.Context, comId int) ([]model.CommunityMember, error) {
+	sql := `SELECT u.id, u.fullname, u.job_position, COALESCE( u.photo_profile,'')
+	FROM user_community uc
+	JOIN users u ON uc.user_id = u.id
+	WHERE uc.community_id = $1`
+
+	rows, err := r.db.Query(ctx, sql, comId)
+	if err != nil {
+		return nil, err
+
+	}
+	defer rows.Close()
+
+	var members []model.CommunityMember
+
+	for rows.Next() {
+		var member model.CommunityMember
+		if err := rows.Scan(&member.ID, &member.FullName, &member.JobPosition, &member.PhotoProfile); err != nil {
+			return nil, err
+		}
+		members = append(members, member)
+
+	}
+	return members, nil
+}
