@@ -68,3 +68,12 @@ func (s *CommunityService) JoinCommunity(ctx context.Context, userId, comId int)
 	return nil
 
 }
+
+func (s *CommunityService) LeaveCommunity(ctx context.Context, userId, comId int) error {
+	err := s.repo.LeaveCommunity(ctx, userId, comId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

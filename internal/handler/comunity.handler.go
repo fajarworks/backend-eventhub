@@ -124,3 +124,48 @@ func (h *CommunityHandler) JoinCommunity(ctx *gin.Context) {
 	})
 
 }
+
+// JoinCommunity godoc
+//
+// @Summary      Leave a community
+// @Description  Allows the authenticated user to leave a community
+// @Tags         Community
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "Community ID"
+// @Security     BearerAuth
+// @Router       /communities/{id}/leave [delete]
+// @Success      200 {object} dto.Response
+// @Failure      400 {object} dto.Response
+// @Failure      401 {object} dto.Response
+func (h *CommunityHandler) LeaveCommunity(ctx *gin.Context) {
+	userId, exist := ctx.Get("userId")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, dto.Response{
+			Success: false,
+			Message: "please login first",
+		})
+		return
+	}
+	comId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusBadRequest, dto.Response{
+			Success: false,
+			Message: "wrong community id",
+		})
+		return
+	}
+	if err := h.service.LeaveCommunity(ctx, userId.(int), comId); err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Message: "server error occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Message: "user leave community successfully",
+	})
+}

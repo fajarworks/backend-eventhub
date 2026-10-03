@@ -98,3 +98,15 @@ func (r *CommunityRepo) JoinCommunity(ctx context.Context, userId, comId int) er
 	}
 	return nil
 }
+
+func (r *CommunityRepo) LeaveCommunity(ctx context.Context, userId, comId int) error {
+	sql := `DELETE FROM user_community WHERE user_id = $1 AND community_id = $2`
+	cmdTag, err := r.db.Exec(ctx, sql, userId, comId)
+	if err != nil {
+		return err
+	}
+	if cmdTag.RowsAffected() == 0 {
+		return apperror.ErrNoRowsAffected
+	}
+	return nil
+}
