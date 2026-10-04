@@ -1,11 +1,31 @@
 basePath: /
 definitions:
+  dto.AdminOverview:
+    properties:
+      avg_fill_rate:
+        type: integer
+      total_community:
+        type: integer
+      total_event:
+        type: integer
+      total_user:
+        type: integer
+    type: object
   dto.LoginRequest:
     properties:
       email:
         type: string
       password:
         type: string
+    type: object
+  dto.OrganizerStats:
+    properties:
+      avg_fill_rate:
+        type: integer
+      total_attendees:
+        type: integer
+      total_events:
+        type: integer
     type: object
   dto.Response:
     properties:
@@ -22,6 +42,41 @@ info:
   title: Eventhub
   version: "1.0"
 paths:
+  /admin/overview:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves overview data for the admin dashboard (platform-wide
+        summary statistics). Requires authentication and admin role.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AdminOverview'
+              type: object
+        "401":
+          description: Unauthorized - token is missing, invalid, or expired
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "403":
+          description: Forbidden - user is not an admin
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      security:
+      - BearerAuth: []
+      summary: Get admin dashboard overview
+      tags:
+      - admin
   /auth/login:
     post:
       consumes:
@@ -56,6 +111,88 @@ paths:
       summary: Login to authentication
       tags:
       - Auth
+  /communities/{id}/join:
+    post:
+      consumes:
+      - application/json
+      description: Allows the authenticated user to join a community
+      parameters:
+      - description: Community ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      security:
+      - BearerAuth: []
+      summary: Join a community
+      tags:
+      - Community
+  /communities/{id}/leave:
+    delete:
+      consumes:
+      - application/json
+      description: Allows the authenticated user to leave a community
+      parameters:
+      - description: Community ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      security:
+      - BearerAuth: []
+      summary: Leave a community
+      tags:
+      - Community
+  /communities/popular:
+    get:
+      consumes:
+      - application/json
+      description: Get Most Popular Communities
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Community
   /events/{id}:
     get:
       description: get a detail information of an event
@@ -79,6 +216,116 @@ paths:
       summary: retrieves an event detail
       tags:
       - Events
+  /events/{id}/remove:
+    delete:
+      consumes:
+      - application/json
+      description: Allows the authenticated user to remove a saved event
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      security:
+      - BearerAuth: []
+      summary: remove saved a event
+      tags:
+      - Events
+  /events/{id}/save:
+    post:
+      consumes:
+      - application/json
+      description: Allows the authenticated user to save an event
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      security:
+      - BearerAuth: []
+      summary: saved an event
+      tags:
+      - Events
+  /organizer/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistic dashboard for organizer Authorized (total event,
+        total attendee, and fill rate average).
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.OrganizerStats'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      security:
+      - BearerAuth: []
+      summary: Get organizer dashboard statistics
+      tags:
+      - Organizer
+  /testimonials:
+    get:
+      description: get testimoanials for app
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: retrieves testimonials
+      tags:
+      - Testimonials
   /user/update:
     patch:
       consumes:
@@ -126,7 +373,7 @@ paths:
       tags:
       - User
 securityDefinitions:
-  BearerToken:
+  BearerAuth:
     description: Bearer token used as identiity for accessing backend
     in: header
     name: Authorization
