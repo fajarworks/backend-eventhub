@@ -22,15 +22,13 @@ type EventResponse struct {
 }
 
 type CreateEventRequest struct {
-	ID          int                  `form:"id"`
-	OrganizerId int                  `form:"organizer_id"`
-	Title       string               `form:"title"`
-	Image       multipart.FileHeader `form:"image"`
+	Title       string               `form:"title" binding:"required"`
+	Image       multipart.FileHeader `form:"image" binding:"required"`
 	Description string               `form:"description"`
-	Location    string               `form:"location"`
-	Capacity    int                  `form:"capacity"`
-	StartTime   time.Time            `form:"start_time"`
-	EndTime     time.Time            `form:"end_time"`
+	Location    string               `form:"location" binding:"required"`
+	Capacity    int                  `form:"capacity" binding:"required,gt=0"`
+	StartTime   time.Time            `form:"start_time" binding:"required"`
+	EndTime     time.Time            `form:"end_time" binding:"required"`
 	Categories  []int                `form:"categories"`
 	Speakers    []int                `form:"speakers"`
 	NewSpeakers string               `form:"new_speakers"`
