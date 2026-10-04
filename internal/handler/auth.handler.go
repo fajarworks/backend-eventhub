@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/fajarworks/backend-eventhub/internal/dto"
 	apperror "github.com/fajarworks/backend-eventhub/internal/errror"
@@ -127,4 +128,43 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		Message: "user login successfully",
 	})
 
+}
+
+func (h *AuthHandler) Logout(ctx *gin.Context) {
+	userId, exist := ctx.Get("userId")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, dto.Response{
+			Success: false,
+			Message: "unathorized",
+		})
+		return
+	}
+
+	jti, exist := ctx.Get("jti")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, dto.Response{
+			Success: false,
+			Message: "please login first",
+		})
+		return
+	}
+	exp, exist := ctx.Get("exp")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, dto.Response{
+			Success: false,
+			Message: "please login first",
+		})
+		return
+	}
+	if err := h.service.Logout(ctx, userId.(int), jti.(string), exp.(time.Time)); err != nil {
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Message: "server error occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Message: "logout success",
+	})
 }

@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/fajarworks/backend-eventhub/internal/dto"
 	apperror "github.com/fajarworks/backend-eventhub/internal/errror"
@@ -10,15 +12,18 @@ import (
 	"github.com/fajarworks/backend-eventhub/internal/pkg"
 	"github.com/fajarworks/backend-eventhub/internal/repository"
 	"github.com/jackc/pgx/v5"
+	"github.com/redis/go-redis/v9"
 )
 
 type AuthService struct {
 	repo *repository.AuthRepo
+	rdb  *redis.Client
 }
 
-func NewAuthService(repo *repository.AuthRepo) *AuthService {
+func NewAuthService(repo *repository.AuthRepo, rdb *redis.Client) *AuthService {
 	return &AuthService{
 		repo: repo,
+		rdb:  rdb,
 	}
 }
 
@@ -83,4 +88,18 @@ func (s *AuthService) User(ctx context.Context, body dto.LoginRequest) (string, 
 	claims := pkg.NewJWTClaims(user.Id, user.Role)
 
 	return claims.GenToken()
+}
+
+func (s *AuthService) Logout(ctx context.Context, userId int, jti string, expiresAt time.Time) error {
+
+	key := fmt.Sprintf("eventhub:blacklist:%s", jti)
+	ttl := time.Until(expiresAt)
+	if ttl <= 0 {
+		return nil
+	}
+
+	if err := s.rdb.Set(ctx, key, userId, ttl).Err(); err != nil {
+		return err
+	}
+	return nil
 }
