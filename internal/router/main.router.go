@@ -15,12 +15,12 @@ func MainRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 
 	r.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	EventRouter(r, db)
-	AuthRouter(r, db)
+	EventRouter(r, db, rdb)
+	AuthRouter(r, db, rdb)
 	UserRouter(r, db, rdb)
 	CategoryRouter(r, db)
-	CommunityRouter(r, db)
+	CommunityRouter(r, db, rdb)
 	TestimonyRouter(r, db)
-	OrganizerRouter(r, db)
-	AdminRouter(r, db)
+	OrganizerRouter(r, db, rdb)
+	AdminRouter(r, db, rdb)
 }

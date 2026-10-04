@@ -16,14 +16,11 @@ import (
 // @version         			1.0
 // @description     			Aplication for eventhub API
 // @host      					localhost:8081
-
 // @BasePath  					/
-
-// @securityDefinitions.apikey 	BearerToken
+// @securityDefinitions.apikey 	BearerAuth
 // @in 							header
 // @name 						Authorization
 // @description 				Bearer token used as identiity for accessing backend
-
 func main() {
 
 	if err := godotenv.Load(); err != nil {

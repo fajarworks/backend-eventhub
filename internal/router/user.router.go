@@ -13,7 +13,7 @@ import (
 )
 
 func UserRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
-	userRouter := r.Group("/user", middleware.AuthMiddleware)
+	userRouter := r.Group("/user", middleware.AuthMiddleware(rdb))
 
 	userRepo := repository.NewUserRepo(db)
 	userService := service.NewUserRepo(userRepo, rdb)
