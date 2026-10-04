@@ -11,10 +11,11 @@ import (
 )
 
 func OrganizerRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
-	organizerRouter := r.Group("/organizer")
-	organizerRepo := repository.NewOrganizerRepo(db)
-	organizerSerivce := service.NewOrganizerService(organizerRepo)
+	organizerRouter := r.Group("/organizer", middleware.AuthMiddleware(rdb))
+	organizerRepo := repository.NewOrganizerRepo()
+	organizerSerivce := service.NewOrganizerService(organizerRepo, db)
 	organizerHandler := handler.NewOrganizerHandler(organizerSerivce)
-	organizerRouter.GET("stats", middleware.AuthMiddleware(rdb), organizerHandler.GetOrganizerstats)
+	organizerRouter.GET("stats", organizerHandler.GetOrganizerstats)
+	organizerRouter.POST("/create-event", organizerHandler.CreateEvent)
 
 }

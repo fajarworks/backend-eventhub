@@ -12,4 +12,5 @@ var (
 	ErrFileFormat         = errors.New("image format must be jpg/jpeg/png")
 	ErrFileSize           = errors.New("image max size 2mb")
 	ErrWrongPass          = errors.New("password lama salah")
+	ErrInvalidTimeRange   = errors.New("invalid time range")
 )
