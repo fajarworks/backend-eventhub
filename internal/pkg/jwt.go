@@ -2,28 +2,37 @@ package pkg
 
 import (
 	"errors"
+	"log"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 var ErrmissingKey = errors.New("jwt key not found")
 
 type JWTClaims struct {
-	Id   int    `json:"id"`
-	Role string `json:"role"`
+	Id   int
+	Role string
 	jwt.RegisteredClaims
 }
 
 func NewJWTClaims(id int, role string) *JWTClaims {
-	return &JWTClaims{
-		Id:        id,
-		Role:      role,
-		Issuer:    os.Getenv("JWT_ISSUER"),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
+	ID, err := uuid.NewRandom()
+	if err != nil {
+		log.Println(err.Error())
+		return nil
 	}
-
+	return &JWTClaims{
+		Id:   id,
+		Role: role,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    os.Getenv("JWT_ISSUER"),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(10 * time.Minute)),
+			ID:        ID.String(),
+		},
+	}
 }
 
 func (j *JWTClaims) GenToken() (string, error) {
