@@ -1,0 +1,16 @@
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (1, 'events', 'Event Dimulai Besok', 'Event "Modern Web Development with React" akan dimulai besok. Jangan sampai terlewat!', '2026-10-04 20:39:58.202444+00', NULL, 1);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (2, 'events', 'Reminder: Event Hari Ini', 'Event "Building REST API with Go" yang kamu ikuti dimulai hari ini pukul 09:00.', '2026-10-04 20:39:58.202444+00', '2026-09-27 08:00:00+00', 2);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (3, 'community', 'Diskusi Baru di Komunitas', 'Ada diskusi baru di komunitas "Jakarta Web Developers" yang mungkin menarik untukmu.', '2026-10-04 20:39:58.202444+00', NULL, 3);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (4, 'events', 'Event Baru Sesuai Minatmu', 'Event baru "Introduction to Docker" telah ditambahkan di kategori yang kamu ikuti.', '2026-10-04 20:39:58.202444+00', NULL, 4);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (5, 'community', 'Anggota Baru Bergabung', 'Komunitas "Go Indonesia" kedatangan anggota baru minggu ini.', '2026-10-04 20:39:58.202444+00', '2026-09-26 20:00:00+00', 5);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (6, 'events', 'Event Akan Segera Penuh', 'Kuota event "Clean Architecture for Backend" tersisa sedikit lagi, segera daftar!', '2026-10-04 20:39:58.202444+00', NULL, 6);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (7, 'events', 'Terima Kasih Telah Hadir', 'Terima kasih sudah mengikuti event "JavaScript Fundamentals". Jangan lupa isi testimoni ya!', '2026-10-04 20:39:58.202444+00', '2026-09-27 10:00:00+00', 7);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (8, 'community', 'Event Baru dari Komunitas', 'Komunitas "React Indonesia" baru saja membuat event baru, cek sekarang!', '2026-10-04 20:39:58.202444+00', NULL, 8);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (9, 'events', 'Pengingat Event', 'Event "TypeScript for Production" akan dimulai dalam 2 hari.', '2026-10-04 20:39:58.202444+00', NULL, 9);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (10, 'community', 'Diskusi Populer', 'Diskusimu di "Bandung Tech Community" mendapat banyak respon, yuk cek!', '2026-10-04 20:39:58.202444+00', '2026-09-26 15:00:00+00', 10);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (11, 'events', 'Event Dibatalkan', 'Mohon maaf, event "Getting Started with Kubernetes" mengalami perubahan jadwal.', '2026-10-04 20:39:58.202444+00', NULL, 11);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (12, 'events', 'Slot Tersisa Sedikit', 'Buruan daftar! Slot event "Designing Better User Experiences" tinggal sedikit lagi.', '2026-10-04 20:39:58.202444+00', NULL, 12);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (13, 'community', 'Selamat Datang di Komunitas', 'Selamat bergabung di komunitas "Data Science ID"! Yuk mulai berdiskusi.', '2026-10-04 20:39:58.202444+00', '2026-09-25 09:00:00+00', 13);
+INSERT INTO public.notification OVERRIDING SYSTEM VALUE VALUES (14, 'events', 'Event Baru untuk Kamu', 'Event "Introduction to Machine Learning" baru ditambahkan, sesuai minatmu di AI.', '2026-10-04 20:39:58.202444+00', NULL, 14);
+
+SELECT pg_catalog.setval('public.notification_id_seq', 14, true);
