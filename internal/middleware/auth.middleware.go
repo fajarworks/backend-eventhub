@@ -44,6 +44,7 @@ func AuthMiddleware(rc *redis.Client) gin.HandlerFunc {
 		var token pkg.JWTClaims
 		err := token.VerifyToken(result[1])
 		if err != nil {
+			log.Println(err.Error())
 			if errors.Is(err, jwt.ErrTokenExpired) || errors.Is(err, jwt.ErrTokenInvalidIssuer) {
 				ctx.AbortWithStatusJSON(http.StatusUnauthorized, dto.Response{
 					Success: false,
@@ -53,7 +54,7 @@ func AuthMiddleware(rc *redis.Client) gin.HandlerFunc {
 			}
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, dto.Response{
 				Success: false,
-				Message: "terjadi kesalahan server",
+				Message: "an server error occured",
 			})
 			return
 
