@@ -61,6 +61,29 @@ func (h *OrganizerHandler) GetOrganizerstats(ctx *gin.Context) {
 	})
 }
 
+// CreateEvent godoc
+// @Summary      Create a new event
+// @Description  Creates a new event with an uploaded image, and optionally assigns existing categories, existing speakers, and new speakers (as a JSON array string). Requires authentication as an organizer.
+// @Tags         Organizer
+// @Accept       multipart/form-data
+// @Produce      json
+// @Security     BearerAuth
+// @Param        title          formData  string  true   "Event title"
+// @Param        description    formData  string  false  "Event description"
+// @Param        location       formData  string  true   "Event location"
+// @Param        capacity       formData  int     true   "Maximum number of attendees"
+// @Param        start_time     formData  string  true   "Event start time"
+// @Param        end_time       formData  string  true   "Event end time"
+// @Param        community_id   formData  int     false  "Community ID this event belongs to"
+// @Param        categories     formData  []int   false  "Existing category IDs to assign" collectionFormat(multi)
+// @Param        speakers       formData  []int   false  "Existing speaker IDs to assign" collectionFormat(multi)
+// @Param        new_speakers   formData  string  false  "[{\"name\":\"John Doe\",\"job_position\":\"CTO\"}]"
+// @Param        image          formData  file    true   "Event cover image"
+// @Success      200  {object}  dto.Response{data=object{eventId=int}}  "Event created successfully"
+// @Failure      400  {object}  dto.Response  "Invalid request body or new_speakers format"
+// @Failure      401  {object}  dto.Response  "Unauthorized - please login first"
+// @Failure      500  {object}  dto.Response  "Internal server error"
+// @Router       /organizer/create-event [post]
 func (h *OrganizerHandler) CreateEvent(ctx *gin.Context) {
 	var body dto.CreateEventRequest
 	organizerId, exist := ctx.Get("userId")

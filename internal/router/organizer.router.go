@@ -11,7 +11,7 @@ import (
 )
 
 func OrganizerRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
-	organizerRouter := r.Group("/organizer", middleware.AuthMiddleware(rdb))
+	organizerRouter := r.Group("/organizer", middleware.AuthMiddleware(rdb), middleware.OrganizerMiddleware)
 	organizerRepo := repository.NewOrganizerRepo()
 	organizerSerivce := service.NewOrganizerService(organizerRepo, db)
 	organizerHandler := handler.NewOrganizerHandler(organizerSerivce)
