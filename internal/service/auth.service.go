@@ -64,30 +64,39 @@ func (s *AuthService) NewUser(ctx context.Context, body dto.RegisterRequest) err
 	return nil
 }
 
-func (s *AuthService) User(ctx context.Context, body dto.LoginRequest) (string, error) {
+func (s *AuthService) User(ctx context.Context, body dto.LoginRequest) (dto.LoginResponse, error) {
 	if body.Email == "" || len(body.Password) == 0 {
-		return "", apperror.ErrEmptyField
+		return dto.LoginResponse{}, apperror.ErrEmptyField
 	}
 
 	if err := pkg.ValidateLengthPass(body.Password); err != nil {
-		return "", err
+		return dto.LoginResponse{}, err
 	}
 
 	user, err := s.repo.FindUserByEmail(ctx, body.Email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 
-			return "", apperror.ErrWrongEmailPass
+			return dto.LoginResponse{}, apperror.ErrWrongEmailPass
 		}
-		return "", err
+		return dto.LoginResponse{}, err
 	}
 	if err := pkg.ComparePassAndHash(body.Password, user.Password); err != nil {
-		return "", apperror.ErrWrongEmailPass
+		return dto.LoginResponse{}, apperror.ErrWrongEmailPass
 	}
 
 	claims := pkg.NewJWTClaims(user.Id, user.Role)
+	token, err := claims.GenToken()
+	if err != nil {
+		return dto.LoginResponse{}, err
+	}
 
-	return claims.GenToken()
+	return dto.LoginResponse{
+		Token:        token,
+		Fullname:     user.Fullname,
+		Email:        user.Email,
+		PhotoProfile: user.PhotoProfile,
+	}, err
 }
 
 func (s *AuthService) Logout(ctx context.Context, userId int, jti string, expiresAt time.Time) error {

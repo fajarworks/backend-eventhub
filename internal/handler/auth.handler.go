@@ -23,18 +23,18 @@ func NewAuthHandler(service *service.AuthService) *AuthHandler {
 	}
 }
 
-// Login
-// @Summary			Login to authentication
-// @Description		login to access all features app
-// @Tags			Auth
-// @Accept       	json
-// @Produce      	json
-// @param			data	body	dto.LoginRequest	true "login woi"
-// @success 		200 {object} dto.Response
-// @failure			400 {object} dto.Response
-// @failure			409 {object} dto.Response
-// @failure			500 {object} dto.Response
-// @router			/auth/login [post]
+// Register godoc
+// @Summary      Register a new user
+// @Description  Creates a new user account with fullname, email, and password. Email must be unique and in a valid format.
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        body  body      dto.RegisterRequest  true  "Registration details"
+// @Success      201   {object}  dto.Response  "User created successfully"
+// @Failure      400   {object}  dto.Response  "Invalid request body, empty field, or invalid email format"
+// @Failure      409   {object}  dto.Response  "Email already registered"
+// @Failure      500   {object}  dto.Response  "Internal server error"
+// @Router       /auth/register [post]
 func (h *AuthHandler) Register(ctx *gin.Context) {
 	var body dto.RegisterRequest
 
@@ -86,6 +86,18 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 	})
 }
 
+// Login
+// @Summary			Login to authentication
+// @Description		login to access all features app
+// @Tags			Auth
+// @Accept       	json
+// @Produce      	json
+// @param			data	body	dto.LoginRequest	true "login woi"
+// @success 		200 {object} dto.Response
+// @failure			400 {object} dto.Response
+// @failure			409 {object} dto.Response
+// @failure			500 {object} dto.Response
+// @router			/auth/login [post]
 func (h *AuthHandler) Login(ctx *gin.Context) {
 	var body dto.LoginRequest
 

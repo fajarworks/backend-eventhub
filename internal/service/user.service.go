@@ -67,33 +67,33 @@ func (s *UserService) GetDetailUser(ctx context.Context, id int) (model.User, er
 
 }
 
-func (s *UserService) UpdateProfile(ctx context.Context, userId int, req dto.UpdateProfileRequest) (model.User, error) {
+func (s *UserService) UpdateProfile(ctx context.Context, userId int, req dto.UpdateProfileRequest) (dto.UserResponse, error) {
 	var imagePath *string
 
 	if req.PhotoProfile != nil {
 		file := req.PhotoProfile
 		ext := strings.ToLower(filepath.Ext(file.Filename))
 		if ext != ".jpg" && ext != ".png" && ext != ".jpeg" {
-			return model.User{}, apperror.ErrFileFormat
+			return dto.UserResponse{}, apperror.ErrFileFormat
 		}
 
 		if file.Size > 2*1024*1024 {
-			return model.User{}, apperror.ErrFileSize
+			return dto.UserResponse{}, apperror.ErrFileSize
 		}
 		filename := fmt.Sprintf("%d_%d%s", time.Now().UnixNano(), userId, path.Ext(req.PhotoProfile.Filename))
 		filepath := path.Join("public", "images", filename)
 
 		src, err := file.Open()
 		if err != nil {
-			return model.User{}, err
+			return dto.UserResponse{}, err
 		}
 		defer src.Close()
 		data, err := io.ReadAll(src)
 		if err != nil {
-			return model.User{}, err
+			return dto.UserResponse{}, err
 		}
 		if err := os.WriteFile(filepath, data, 0644); err != nil {
-			return model.User{}, err
+			return dto.UserResponse{}, err
 		}
 
 		var url string = "images" + filename
@@ -101,9 +101,18 @@ func (s *UserService) UpdateProfile(ctx context.Context, userId int, req dto.Upd
 	}
 	dataUser, err := s.repo.UpdateProfile(ctx, userId, imagePath, req.Fullname, req.Location, req.JobPosition, req.Bio)
 	if err != nil {
-		return model.User{}, err
+		return dto.UserResponse{}, err
 	}
-	return dataUser, nil
+	return dto.UserResponse{
+		Id:           userId,
+		Role:         dataUser.Role,
+		Fullname:     dataUser.Fullname,
+		Email:        dataUser.Email,
+		PhotoProfile: dataUser.PhotoProfile,
+		JobPosition:  dataUser.JobPosition,
+		Location:     dataUser.Location,
+		Bio:          dataUser.Bio,
+	}, nil
 }
 
 func (r *UserService) ChangePassword(ctx context.Context, userId int, oldPassword, newPassword string) error {
