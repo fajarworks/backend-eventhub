@@ -42,7 +42,7 @@ func (h *CommunityHandler) GetDetailCommunity(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, dto.Response{
-		Success: false,
+		Success: true,
 		Data:    com,
 		Message: "successfully retrieved community detail",
 	})
@@ -56,7 +56,7 @@ func (h *CommunityHandler) GetCommunityMembers(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, dto.Response{
 
 			Success: false,
-			Message: "terjadi kesalahan server",
+			Message: "server error occured",
 		})
 		return
 	}
