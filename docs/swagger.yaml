@@ -14,9 +14,14 @@ definitions:
   dto.LoginRequest:
     properties:
       email:
+        example: maruf321@mail.com
         type: string
       password:
+        example: moonchaser1234
         type: string
+    required:
+    - email
+    - password
     type: object
   dto.OrganizerStats:
     properties:
@@ -26,6 +31,22 @@ definitions:
         type: integer
       total_events:
         type: integer
+    type: object
+  dto.RegisterRequest:
+    properties:
+      email:
+        maxLength: 255
+        type: string
+      fullname:
+        maxLength: 255
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - fullname
+    - password
     type: object
   dto.Response:
     properties:
@@ -109,6 +130,41 @@ paths:
           schema:
             $ref: '#/definitions/dto.Response'
       summary: Login to authentication
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account with fullname, email, and password.
+        Email must be unique and in a valid format.
+      parameters:
+      - description: Registration details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Invalid request body, empty field, or invalid email format
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "409":
+          description: Email already registered
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Register a new user
       tags:
       - Auth
   /communities/{id}/join:
@@ -278,6 +334,102 @@ paths:
       summary: saved an event
       tags:
       - Events
+  /organizer/create-event:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Creates a new event with an uploaded image, and optionally assigns
+        existing categories, existing speakers, and new speakers (as a JSON array
+        string). Requires authentication as an organizer.
+      parameters:
+      - description: Event title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Event description
+        in: formData
+        name: description
+        type: string
+      - description: Event location
+        in: formData
+        name: location
+        required: true
+        type: string
+      - description: Maximum number of attendees
+        in: formData
+        name: capacity
+        required: true
+        type: integer
+      - description: Event start time
+        in: formData
+        name: start_time
+        required: true
+        type: string
+      - description: Event end time
+        in: formData
+        name: end_time
+        required: true
+        type: string
+      - description: Community ID this event belongs to
+        in: formData
+        name: community_id
+        type: integer
+      - collectionFormat: multi
+        description: Existing category IDs to assign
+        in: formData
+        items:
+          type: integer
+        name: categories
+        type: array
+      - collectionFormat: multi
+        description: Existing speaker IDs to assign
+        in: formData
+        items:
+          type: integer
+        name: speakers
+        type: array
+      - description: '[{\'
+        in: formData
+        name: new_speakers
+        type: string
+      - description: Event cover image
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Event created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  properties:
+                    eventId:
+                      type: integer
+                  type: object
+              type: object
+        "400":
+          description: Invalid request body or new_speakers format
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized - please login first
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a new event
+      tags:
+      - Organizer
   /organizer/stats:
     get:
       consumes:
