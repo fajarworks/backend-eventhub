@@ -117,15 +117,7 @@ func (h *UserHandler) UpdateUser(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, dto.Response{
 		Success: true,
-		Data: dto.UserResponse{
-			Id:           user.Id,
-			PhotoProfile: user.PhotoProfile,
-			Fullname:     user.Fullname,
-			JobPosition:  user.JobPosition,
-			Location:     user.Location,
-			Bio:          user.Bio,
-			UpdatedAt:    user.UpdatedAt,
-		},
+		Data:    user,
 		Message: "user updated",
 	})
 

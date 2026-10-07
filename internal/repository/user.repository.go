@@ -46,10 +46,10 @@ func (r *UserRepo) UpdateProfile(ctx context.Context, userId int, photoProfile, 
 	bio = COALESCE ($5, bio),
 	updated_at = NOW()
 	WHERE id = $6
-	RETURNING id, photo_profile, fullname, location, bio, updated_at`
+	RETURNING id, photo_profile, fullname, email, role, location, job_position, bio, updated_at`
 
 	var user model.User
-	err := r.db.QueryRow(ctx, sql, photoProfile, fullName, location, jobPosition, bio, userId).Scan(&user.Id, &user.PhotoProfile, &user.Fullname, &user.Location, &user.Bio, &user.UpdatedAt)
+	err := r.db.QueryRow(ctx, sql, photoProfile, fullName, location, jobPosition, bio, userId).Scan(&user.Id, &user.PhotoProfile, &user.Fullname, &user.Email, &user.Role, &user.Location, &jobPosition, &user.Bio, &user.UpdatedAt)
 	if err != nil {
 		return model.User{}, err
 	}

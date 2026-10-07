@@ -19,10 +19,10 @@ func NewAuthRepo(db *pgxpool.Pool) *AuthRepo {
 }
 
 func (r *AuthRepo) FindUserByEmail(ctx context.Context, email string) (model.User, error) {
-	sql := "SELECT id, role, password FROM users WHERE email =$1"
+	sql := "SELECT id, fullname, email, role, photo_profile, password FROM users WHERE email = $1"
 	args := []any{email}
 	var data model.User
-	if err := r.db.QueryRow(ctx, sql, args...).Scan(&data.Id, &data.Role, &data.Password); err != nil {
+	if err := r.db.QueryRow(ctx, sql, args...).Scan(&data.Id, &data.Fullname, &data.Email, &data.Role, &data.PhotoProfile, &data.Password); err != nil {
 		return model.User{}, err
 	}
 	return data, nil
