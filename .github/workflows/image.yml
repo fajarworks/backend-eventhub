@@ -2,7 +2,7 @@ name: creating image server
 on:
   push:
     tags:
-      -v*
+      - v*
 
 jobs:
   image:
