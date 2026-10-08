@@ -54,5 +54,5 @@ func main() {
 
 	router.MainRouter(r, pool, rdb)
 	fmt.Println("connected to data base")
-	r.Run(fmt.Sprintf("%s:%s", os.Getenv("DB_HOST"), os.Getenv("PORT")))
+	r.Run(fmt.Sprintf("%s:%s", os.Getenv("SERVER_HOST"), os.Getenv("PORT")))
 }
