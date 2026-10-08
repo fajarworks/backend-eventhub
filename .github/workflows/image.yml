@@ -1,0 +1,21 @@
+name: creating image server
+on:
+  push:
+    tags:
+      -v*
+
+jobs:
+  image:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v7
+      - name: run docker build
+        run: docker build -t ghcr.io/${{github.repository}}:latest
+      
+      - name: login to ghcr
+        run: |
+          echo "${{secrets.GITHUB_TOKEN}}" | docker login ghcr.io --username ${{github.actor}} --password-stdin
+      - name: push to ghcr
+        run: docker push ghcr.io/${{github.repository}}:latest
+
