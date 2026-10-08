@@ -1,0 +1,13 @@
+name: test
+on:
+  push:
+    branches: cicd
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: musuh terlihat
+        run: echo "saya akan lawan"
+      - name: greet to me
+        run: echo "hello ${{github.actor}}"
+      
