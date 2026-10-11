@@ -1,0 +1,7 @@
+public
+tmp
+.air.toml
+.env*
+*.http
+makefile
+db
