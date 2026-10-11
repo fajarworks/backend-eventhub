@@ -25,3 +25,12 @@ type PopularCommunities struct {
 	CreatedAt      time.Time `db:"created_at"`
 	UpdatedAt      time.Time `db:"updated_at"`
 }
+
+type CommunityResponse struct {
+	ID             int      `db:"id"`
+	Name           string   `db:"name"`
+	Image          string   `db:"image"`
+	Categories     []string `db:"categories"`
+	UpcomingEvents int      `db:"upcoming_event"`
+	Members        int      `db:"members"`
+}

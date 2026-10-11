@@ -164,3 +164,34 @@ func (r *CommunityRepo) GetJoinedCommunities(ctx context.Context, userId int) ([
 	return communityIds, err
 
 }
+
+func (r *CommunityRepo) GetCommunitiesByUserId(ctx context.Context, userId int) ([]model.CommunityResponse, error) {
+	sql := `SELECT
+			c.id, c.name, c.image,
+			COALESCE((
+				SELECT ARRAY_AGG(cat.name ORDER BY cat.name)
+				FROM community_category cc
+				JOIN categories cat ON cat.id = cc.category_id
+				WHERE cc.community_id = c.id
+			), '{}') AS categories,
+			(SELECT COUNT(*) FROM user_community m WHERE m.community_id = c.id) AS members_count,
+			(SELECT COUNT(*) FROM events e
+				WHERE e.community_id = c.id AND e.start_time >= now()) AS upcoming_events_count
+		FROM user_community uc
+		JOIN communities c ON c.id = uc.community_id
+		WHERE uc.user_id = $1
+		ORDER BY c.name`
+	rows, err := r.db.Query(ctx, sql, userId)
+	if err != nil {
+		return nil, err
+	}
+	data := make([]model.CommunityResponse, 0)
+	for rows.Next() {
+		var com model.CommunityResponse
+		if err := rows.Scan(&com.ID, &com.Name, &com.Image, &com.Categories, &com.Members, &com.UpcomingEvents); err != nil {
+			return nil, err
+		}
+		data = append(data, com)
+	}
+	return data, nil
+}

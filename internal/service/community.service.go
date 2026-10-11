@@ -102,3 +102,22 @@ func (s *CommunityService) GetPopularCommunity(ctx context.Context) ([]dto.Popul
 func (s *CommunityService) GetJoinedCommunities(ctx context.Context, userId int) ([]int, error) {
 	return s.repo.GetJoinedCommunities(ctx, userId)
 }
+
+func (s *CommunityService) GetCommunitiesByUserId(ctx context.Context, userId int) ([]dto.UserCommunityResponse, error) {
+	data, err := s.repo.GetCommunitiesByUserId(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	var communities []dto.UserCommunityResponse
+	for _, com := range data {
+		communities = append(communities, dto.UserCommunityResponse{
+			ID:             com.ID,
+			Image:          com.Image,
+			Name:           com.Name,
+			Categories:     com.Categories,
+			Members:        com.Members,
+			UpcomingEvents: com.UpcomingEvents,
+		})
+	}
+	return communities, nil
+}

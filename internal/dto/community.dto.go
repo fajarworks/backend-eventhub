@@ -27,3 +27,21 @@ type PopularCommunities struct {
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
+
+type UserCommunityResponse struct {
+	ID             int      `json:"id"`
+	Image          string   `json:"image"`
+	Name           string   `json:"name"`
+	Categories     []string `json:"categories"`
+	Members        int      `json:"members"`
+	UpcomingEvents int      `json:"upcoming_event"`
+}
+
+type CommunitiesResponse struct {
+	ID             int      `json:"id"`
+	Image          string   `json:"image"`
+	Name           string   `json:"name"`
+	Categories     []string `json:"categories"`
+	Members        int      `json:"members"`
+	UpcomingEvents int      `json:"upcoming_event"`
+}
