@@ -98,3 +98,7 @@ func (s *CommunityService) GetPopularCommunity(ctx context.Context) ([]dto.Popul
 	}
 	return communities, nil
 }
+
+func (s *CommunityService) GetJoinedCommunities(ctx context.Context, userId int) ([]int, error) {
+	return s.repo.GetJoinedCommunities(ctx, userId)
+}

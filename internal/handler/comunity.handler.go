@@ -195,3 +195,28 @@ func (h *CommunityHandler) GetPopularCommunity(ctx *gin.Context) {
 		Message: "popular communities retrieved successfully",
 	})
 }
+
+func (h *CommunityHandler) GetJoinedCommunities(ctx *gin.Context) {
+	userId, exist := ctx.Get("userId")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, dto.Response{
+			Success: false,
+			Message: "please login first",
+		})
+		return
+	}
+	communityIds, err := h.service.GetJoinedCommunities(ctx.Request.Context(), userId.(int))
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Message: "server error occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: false,
+		Data:    communityIds,
+		Message: "joined communities retrieved successfully",
+	})
+}

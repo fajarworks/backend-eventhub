@@ -126,7 +126,7 @@ func (r *CommunityRepo) GetPopularCommunity(ctx context.Context) ([]model.Popula
 	LEFT JOIN events ON events.community_id = communities.id AND events.start_time >= now()
 	GROUP BY communities.id
 	ORDER BY members_count DESC
-	LIMIT 3`
+	LIMIT 4`
 	rows, err := r.db.Query(ctx, sql)
 	if err != nil {
 		return nil, err
@@ -144,4 +144,23 @@ func (r *CommunityRepo) GetPopularCommunity(ctx context.Context) ([]model.Popula
 		communities = append(communities, community)
 	}
 	return communities, nil
+}
+
+func (r *CommunityRepo) GetJoinedCommunities(ctx context.Context, userId int) ([]int, error) {
+	sql := `SELECT community_id FROM user_community WHERE user_id = $1`
+
+	rows, err := r.db.Query(ctx, sql, userId)
+	if err != nil {
+		return nil, err
+	}
+	communityIds := make([]int, 0)
+	for rows.Next() {
+		var id int
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		communityIds = append(communityIds, id)
+	}
+	return communityIds, err
+
 }

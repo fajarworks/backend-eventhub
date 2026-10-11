@@ -21,4 +21,5 @@ func CommunityRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 	comRouter.POST("/:id/join", middleware.AuthMiddleware(rdb), comHandler.JoinCommunity)
 	comRouter.DELETE("/:id/leave", middleware.AuthMiddleware(rdb), comHandler.LeaveCommunity)
 	comRouter.GET("/popular", comHandler.GetPopularCommunity)
+	comRouter.GET("/join", middleware.AuthMiddleware(rdb), comHandler.GetJoinedCommunities)
 }
