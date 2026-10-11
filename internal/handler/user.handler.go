@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -91,7 +92,7 @@ func (h *UserHandler) UpdateUser(ctx *gin.Context) {
 		})
 		return
 	}
-
+	fmt.Println(updateUserReq)
 	user, err := h.service.UpdateProfile(ctx.Request.Context(), userId.(int), updateUserReq)
 	if err != nil {
 		log.Println(err.Error())
@@ -134,10 +135,11 @@ func (h *UserHandler) ChangePassword(ctx *gin.Context) {
 	var body dto.ChangePassword
 	if err := ctx.ShouldBindWith(&body, binding.JSON); err != nil {
 		log.Println(err.Error())
-		ctx.JSON(http.StatusInternalServerError, dto.Response{
+		ctx.JSON(http.StatusBadRequest, dto.Response{
 			Success: false,
 			Message: "server error occured",
 		})
+		fmt.Println(body)
 		return
 	}
 	err := h.service.ChangePassword(ctx, userId.(int), body.OldPassword, body.NewPassword)

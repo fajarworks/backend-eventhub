@@ -96,13 +96,16 @@ func (s *UserService) UpdateProfile(ctx context.Context, userId int, req dto.Upd
 			return dto.UserResponse{}, err
 		}
 
-		var url string = "images" + filename
+		var url string = "/images/" + filename
 		imagePath = &url
 	}
 	dataUser, err := s.repo.UpdateProfile(ctx, userId, imagePath, req.Fullname, req.Location, req.JobPosition, req.Bio)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
+	key := fmt.Sprintf("eventhub:user%d", userId)
+
+	s.rdb.Del(ctx, key)
 	return dto.UserResponse{
 		Id:           userId,
 		Role:         dataUser.Role,
