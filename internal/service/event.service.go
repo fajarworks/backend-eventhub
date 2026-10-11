@@ -63,24 +63,32 @@ func (s *EventService) GetEvents(ctx context.Context, categoryId int, location, 
 	return result, nil
 }
 
-func (s *EventService) ToggleJoinEvent(ctx context.Context, userId, eventId int) (bool, error) {
-	joined, err := s.repo.IsJoinEvent(ctx, userId, eventId)
-	if err != nil {
-		return false, err
-	}
+// func (s *EventService) ToggleJoinEvent(ctx context.Context, userId, eventId int) (bool, error) {
+// 	joined, err := s.repo.IsJoinEvent(ctx, userId, eventId)
+// 	if err != nil {
+// 		return false, err
+// 	}
 
-	if joined {
-		if err := s.repo.LeaveEvent(ctx, userId, eventId); err != nil {
-			return false, err
+// 	if joined {
+// 		if err := s.repo.LeaveEvent(ctx, userId, eventId); err != nil {
+// 			return false, err
 
-		}
-		return false, nil
-	}
+// 		}
+// 		return false, nil
+// 	}
 
-	if err := s.repo.JoinEvent(ctx, userId, eventId); err != nil {
-		return false, err
-	}
-	return true, nil
+// 	if err := s.repo.JoinEvent(ctx, userId, eventId); err != nil {
+// 		return false, err
+// 	}
+// 	return true, nil
+// }
+
+func (s *EventService) JoinEvent(ctx context.Context, userId, eventId int) error {
+	return s.repo.JoinEvent(ctx, userId, eventId)
+}
+
+func (s *EventService) LeaveEvent(ctx context.Context, userId, eventId int) error {
+	return s.repo.LeaveEvent(ctx, userId, eventId)
 }
 
 func (s *EventService) GetDetail(ctx context.Context, eventId int) (dto.EventResponse, error) {
@@ -191,4 +199,12 @@ func (s *EventService) RemoveSavedEvent(ctx context.Context, userId, eventId int
 		return err
 	}
 	return nil
+}
+
+func (s *EventService) GetJoinedEventIds(ctx context.Context, userId int) ([]int, error) {
+	return s.repo.GetJoinedEventIds(ctx, userId)
+}
+
+func (s *EventService) GetSavedEventIds(ctx context.Context, userId int) ([]int, error) {
+	return s.repo.GetSavedEventIds(ctx, userId)
 }

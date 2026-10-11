@@ -297,3 +297,39 @@ func (r *EventRepo) GetEventSpeakers(ctx context.Context, eventId int) ([]model.
 	}
 	return speakers, nil
 }
+
+func (r *EventRepo) GetJoinedEventIds(ctx context.Context, userId int) ([]int, error) {
+	sql := `SELECT event_id FROM user_event WHERE user_id = $1`
+	rows, err := r.db.Query(ctx, sql, userId)
+	if err != nil {
+		return nil, err
+	}
+	eventIds := make([]int, 0)
+	for rows.Next() {
+		var id int
+		err := rows.Scan(&id)
+		if err != nil {
+			return nil, err
+		}
+		eventIds = append(eventIds, id)
+	}
+	return eventIds, nil
+
+}
+
+func (r *EventRepo) GetSavedEventIds(ctx context.Context, userId int) ([]int, error) {
+	sql := `SELECT event_id FROM user_saved_event WHERE user_id = $1`
+	rows, err := r.db.Query(ctx, sql, userId)
+	if err != nil {
+		return nil, err
+	}
+	eventIds := make([]int, 0)
+	for rows.Next() {
+		var id int
+		err := rows.Scan(&id)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return eventIds, nil
+}

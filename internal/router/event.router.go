@@ -18,10 +18,13 @@ func EventRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 
 	eventRouter.GET("", eventHandler.GetEvents)
 	eventRouter.GET("/:id", eventHandler.GetEventDetail)
-	eventRouter.POST("/:id/toggle-event", middleware.AuthMiddleware(rdb), eventHandler.ToggleJoinEvent)
+	eventRouter.POST("/:id/join", middleware.AuthMiddleware(rdb), eventHandler.JoinEvent)
+	eventRouter.DELETE("/:id/leave", middleware.AuthMiddleware(rdb), eventHandler.LeaveEvent)
 	eventRouter.GET("/upcoming", eventHandler.UpcomingEvent)
 	eventRouter.GET("/my-events", middleware.AuthMiddleware(rdb), eventHandler.GetEventsByUserId)
 	eventRouter.POST("/:id/save", middleware.AuthMiddleware(rdb), eventHandler.SaveEvent)
 	eventRouter.DELETE("/:id/remove", middleware.AuthMiddleware(rdb), eventHandler.RemoveSavedEvent)
+	eventRouter.GET("/join", middleware.AuthMiddleware(rdb), eventHandler.GetJoinedEventIds)
+	eventRouter.GET("/save", middleware.AuthMiddleware(rdb), eventHandler.GetSavedEventIds)
 
 }

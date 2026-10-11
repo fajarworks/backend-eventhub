@@ -46,15 +46,51 @@ func (h *EventHandler) GetEvents(ctx *gin.Context) {
 	})
 }
 
-func (h *EventHandler) ToggleJoinEvent(ctx *gin.Context) {
-	userId, exist := ctx.Get("userId")
-	if !exist {
-		ctx.JSON(http.StatusUnauthorized, dto.Response{
-			Success: false,
-			Message: "unauthorized",
-		})
-		return
-	}
+// func (h *EventHandler) ToggleJoinEvent(ctx *gin.Context) {
+// 	userId, exist := ctx.Get("userId")
+// 	if !exist {
+// 		ctx.JSON(http.StatusUnauthorized, dto.Response{
+// 			Success: false,
+// 			Message: "unauthorized",
+// 		})
+// 		return
+// 	}
+// 	eventId, err := strconv.Atoi(ctx.Param("id"))
+// 	if err != nil {
+// 		ctx.JSON(http.StatusBadRequest, dto.Response{
+// 			Success: false,
+// 			Message: "invalid event id",
+// 		})
+// 		return
+// 	}
+// 	isJoined, err := h.service.ToggleJoinEvent(ctx.Request.Context(), userId.(int), eventId)
+// 	if err != nil {
+// 		log.Println(err.Error())
+// 		ctx.JSON(http.StatusInternalServerError, dto.Response{
+// 			Success: false,
+// 			Message: "server error occured",
+// 		})
+// 		return
+
+// 	}
+
+// 	message := "user left event successfully"
+// 	if isJoined {
+// 		message = "user join event successfully"
+// 	}
+
+// 	ctx.JSON(http.StatusOK, dto.Response{
+// 		Success: true,
+// 		Data: gin.H{
+// 			"is_Joined": isJoined,
+// 		},
+// 		Message: message,
+// 	})
+
+// }
+
+func (h *EventHandler) JoinEvent(ctx *gin.Context) {
+	userId, _ := ctx.Get("userId")
 	eventId, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, dto.Response{
@@ -63,30 +99,45 @@ func (h *EventHandler) ToggleJoinEvent(ctx *gin.Context) {
 		})
 		return
 	}
-	isJoined, err := h.service.ToggleJoinEvent(ctx.Request.Context(), userId.(int), eventId)
-	if err != nil {
+
+	if err := h.service.JoinEvent(ctx.Request.Context(), userId.(int), eventId); err != nil {
 		log.Println(err.Error())
 		ctx.JSON(http.StatusInternalServerError, dto.Response{
 			Success: false,
+			Data:    nil,
 			Message: "server error occured",
 		})
 		return
-
 	}
-
-	message := "user left event successfully"
-	if isJoined {
-		message = "user join event successfully"
-	}
-
 	ctx.JSON(http.StatusOK, dto.Response{
 		Success: true,
-		Data: gin.H{
-			"is_Joined": isJoined,
-		},
-		Message: message,
+		Message: "user has successfully joined event",
 	})
+}
 
+func (h *EventHandler) LeaveEvent(ctx *gin.Context) {
+	userId, _ := ctx.Get("userId")
+	eventId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, dto.Response{
+			Success: false,
+			Message: "invalid event id",
+		})
+		return
+	}
+	if err := h.service.LeaveEvent(ctx.Request.Context(), userId.(int), eventId); err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Data:    nil,
+			Message: "server error occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Message: "user has successfully leave event",
+	})
 }
 
 // Detail Event
@@ -264,4 +315,55 @@ func (h *EventHandler) RemoveSavedEvent(ctx *gin.Context) {
 		Message: "user remove saved event successfully",
 	})
 
+}
+
+func (h *EventHandler) GetJoinedEventIds(ctx *gin.Context) {
+	userId, exist := ctx.Get("userId")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, dto.Response{
+			Success: false,
+			Message: "unauthorized",
+		})
+		return
+	}
+	eventIds, err := h.service.GetJoinedEventIds(ctx.Request.Context(), userId.(int))
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Data:    nil,
+			Message: "server error occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Data:    eventIds,
+		Message: "success get joined event Ids",
+	})
+}
+func (h *EventHandler) GetSavedEventIds(ctx *gin.Context) {
+	userId, exist := ctx.Get("userId")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, dto.Response{
+			Success: false,
+			Message: "unauthorized",
+		})
+		return
+	}
+	eventIds, err := h.service.GetSavedEventIds(ctx.Request.Context(), userId.(int))
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Data:    nil,
+			Message: "server error occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Data:    eventIds,
+		Message: "success get joined event Ids",
+	})
 }
