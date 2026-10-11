@@ -3,22 +3,24 @@ package dto
 import (
 	"mime/multipart"
 	"time"
+
+	"github.com/fajarworks/backend-eventhub/internal/model"
 )
 
 type EventResponse struct {
-	ID          int       `json:"id"`
-	Title       string    `json:"title"`
-	OrganizerId int       `json:"organizer_id"`
-	Description string    `json:"description"`
-	Image       string    `json:"image"`
-	Location    string    `json:"location"`
-	Capacity    int       `json:"capacity"`
-	StartTime   time.Time `json:"start_time"`
-	EndTime     time.Time `json:"end_time"`
-	Speakers    []string  `json:"speakers"`
-	Categories  []string  `json:"categories"`
-	CommunityId int       `json:"community_id"`
-	Attendees   int       `json:"attendees"`
+	ID          int             `json:"id"`
+	Title       string          `json:"title"`
+	OrganizerId int             `json:"organizer_id"`
+	Description string          `json:"description"`
+	Image       string          `json:"image"`
+	Location    string          `json:"location"`
+	Capacity    int             `json:"capacity"`
+	StartTime   time.Time       `json:"start_time"`
+	EndTime     time.Time       `json:"end_time"`
+	Speakers    []model.Speaker `json:"speakers"`
+	Categories  []string        `json:"categories"`
+	CommunityId int             `json:"community_id"`
+	Attendees   int             `json:"attendees"`
 }
 
 type CreateEventRequest struct {

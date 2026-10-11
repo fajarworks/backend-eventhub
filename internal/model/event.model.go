@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Event struct {
 	ID          int        `db:"id"`
@@ -12,7 +14,7 @@ type Event struct {
 	StartTime   time.Time  `db:"start_time"`
 	EndTime     time.Time  `db:"end_time"`
 	Categories  []string   `db:"categories"`
-	Speakers    []string   `db:"speakers"`
+	Speakers    []Speaker  `db:"speakers"`
 	CreatedAt   time.Time  `db:"created_at"`
 	UpdatedAt   *time.Time `db:"updated_at"`
 	CommunityId int        `db:"community_id"`

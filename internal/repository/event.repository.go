@@ -210,7 +210,8 @@ func (r *EventRepo) GetUpcomingEvent(ctx context.Context) ([]model.Event, error)
 	sql := `SELECT id, title, image, location, capacity, start_time, end_time
 	        FROM events
 	        WHERE start_time > NOW()
-	        ORDER BY start_time ASC`
+	        ORDER BY start_time ASC
+			LIMIT 6`
 	rows, err := r.db.Query(ctx, sql)
 	if err != nil {
 		return nil, err
@@ -276,4 +277,23 @@ func (r *EventRepo) RemoveSavedEvent(ctx context.Context, userId, eventId int) e
 		return apperror.ErrNoRowsAffected
 	}
 	return nil
+}
+
+func (r *EventRepo) GetEventSpeakers(ctx context.Context, eventId int) ([]model.Speaker, error) {
+	sql := `SELECT s.id, s.name, s.job_position
+	FROM event_speaker es JOIN speakers s ON s.id = es.speaker_id 
+	WHERE es.event_id = $1;`
+	rows, err := r.db.Query(ctx, sql, eventId)
+	if err != nil {
+		return nil, err
+	}
+	var speakers []model.Speaker
+	var speaker model.Speaker
+	for rows.Next() {
+		if err := rows.Scan(&speaker.ID, &speaker.Name, &speaker.JobPosition); err != nil {
+			return nil, err
+		}
+		speakers = append(speakers, speaker)
+	}
+	return speakers, nil
 }

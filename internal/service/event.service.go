@@ -100,12 +100,15 @@ func (s *EventService) GetDetail(ctx context.Context, eventId int) (dto.EventRes
 		return dto.EventResponse{}, err
 	}
 
+	speakers, err := s.repo.GetEventSpeakers(ctx, eventId)
+
 	return dto.EventResponse{
 		ID:         eventId,
 		Title:      event.Title,
 		Image:      event.Image,
 		Location:   event.Location,
 		Capacity:   event.Capacity,
+		Speakers:   speakers,
 		StartTime:  event.StartTime,
 		Categories: categories,
 		Attendees:  attendees,
