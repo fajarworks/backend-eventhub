@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"path"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/fajarworks/backend-eventhub/internal/dto"
@@ -103,13 +105,39 @@ func (h *OrganizerHandler) CreateEvent(ctx *gin.Context) {
 		return
 	}
 	filename := fmt.Sprintf("%d_%s%s", time.Now().UnixNano(), body.Title, path.Ext(body.Image.Filename))
-	filepath := path.Join("public", "images", "events", filename)
+	fileDest := path.Join("public", "images", "events", filename)
 
-	if err := ctx.SaveUploadedFile(&body.Image, filepath); err != nil {
+	if err := ctx.SaveUploadedFile(&body.Image, fileDest); err != nil {
 		log.Println(err.Error())
 		ctx.JSON(http.StatusInternalServerError, dto.Response{
 			Success: false,
 			Message: "server error occured",
+		})
+		return
+	}
+
+	const maxFileSize = 2 * 1024 * 1024
+
+	if body.Image.Size > maxFileSize {
+		ctx.JSON(http.StatusBadRequest, dto.Response{
+			Success: false,
+			Message: "image must not exceed 2mb",
+		})
+		return
+	}
+
+	ext := strings.ToLower(filepath.Ext(body.Image.Filename))
+	allowedExt := map[string]bool{
+		"jpg":  true,
+		"jpeg": true,
+		"png":  true,
+	}
+
+	if !allowedExt[ext] {
+		ctx.JSON(http.StatusBadGateway, dto.Response{
+			Success: false,
+			Data:    nil,
+			Message: "image must be JPG, JPEG, or PNG",
 		})
 		return
 	}
@@ -125,7 +153,7 @@ func (h *OrganizerHandler) CreateEvent(ctx *gin.Context) {
 			return
 		}
 	}
-	eventId, err := h.service.CreateEvent(ctx, organizerId.(int), filepath, body, newSpeaker)
+	eventId, err := h.service.CreateEvent(ctx, organizerId.(int), fileDest, body, newSpeaker)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, dto.Response{
 			Success: false,
