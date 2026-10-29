@@ -34,5 +34,5 @@ type CreateEventRequest struct {
 	Categories  []int                `form:"categories"`
 	Speakers    []int                `form:"speakers"`
 	NewSpeakers string               `form:"new_speakers"`
-	CommunityId int                  `form:"community_id"`
+	CommunityId *int                 `form:"community_id"`
 }

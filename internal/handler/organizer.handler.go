@@ -128,13 +128,13 @@ func (h *OrganizerHandler) CreateEvent(ctx *gin.Context) {
 
 	ext := strings.ToLower(filepath.Ext(body.Image.Filename))
 	allowedExt := map[string]bool{
-		"jpg":  true,
-		"jpeg": true,
-		"png":  true,
+		".jpg":  true,
+		".jpeg": true,
+		".png":  true,
 	}
 
 	if !allowedExt[ext] {
-		ctx.JSON(http.StatusBadGateway, dto.Response{
+		ctx.JSON(http.StatusBadRequest, dto.Response{
 			Success: false,
 			Data:    nil,
 			Message: "image must be JPG, JPEG, or PNG",
@@ -155,6 +155,7 @@ func (h *OrganizerHandler) CreateEvent(ctx *gin.Context) {
 	}
 	eventId, err := h.service.CreateEvent(ctx, organizerId.(int), fileDest, body, newSpeaker)
 	if err != nil {
+		log.Println(err.Error())
 		ctx.JSON(http.StatusInternalServerError, dto.Response{
 			Success: false,
 			Message: "server error occured",
@@ -162,7 +163,7 @@ func (h *OrganizerHandler) CreateEvent(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, dto.Response{
-		Success: false,
+		Success: true,
 		Data: gin.H{
 			"eventId": eventId,
 		},

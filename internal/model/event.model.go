@@ -17,6 +17,6 @@ type Event struct {
 	Speakers    []Speaker  `db:"speakers"`
 	CreatedAt   time.Time  `db:"created_at"`
 	UpdatedAt   *time.Time `db:"updated_at"`
-	CommunityId int        `db:"community_id"`
+	CommunityId *int       `db:"community_id"`
 	OrganizerId int        `db:"organizer_id"`
 }
