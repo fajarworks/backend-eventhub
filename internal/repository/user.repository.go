@@ -40,10 +40,11 @@ func (r *UserRepo) FindUserById(ctx context.Context, id int) (model.User, error)
 
 func (r *UserRepo) UpdateProfile(ctx context.Context, userId int, photoProfile, fullName, location, jobPosition, bio *string) (model.User, error) {
 	sql := `UPDATE users 
-	SET photo_profile = COALESCE ($1, photo_profile) ,
-	fullname = COALESCE($2, fullname), 
-	location = COALESCE ($3, location), job_position = COALESCE($4, job_position),
-	bio = COALESCE ($5, bio),
+	SET photo_profile = COALESCE ( NULLIF($1, ''), photo_profile) ,
+	fullname = COALESCE(NULLIF($2, ''), fullname), 
+	location = COALESCE ( NULLIF($3, ''), location), 
+	job_position = COALESCE(NULLIF($4, '') , job_position),
+	bio = COALESCE (NULLIF($5, '') , bio),
 	updated_at = NOW()
 	WHERE id = $6
 	RETURNING id, photo_profile, fullname, email, role, location, job_position, bio, updated_at`
