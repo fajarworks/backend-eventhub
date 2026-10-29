@@ -23,4 +23,5 @@ func CommunityRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 	comRouter.GET("/popular", comHandler.GetPopularCommunity)
 	comRouter.GET("/join", middleware.AuthMiddleware(rdb), comHandler.GetJoinedCommunities)
 	comRouter.GET("/my-communities", middleware.AuthMiddleware(rdb), comHandler.GetCommunitiesByUserId)
+	comRouter.GET("", comHandler.GetAllCommunities)
 }

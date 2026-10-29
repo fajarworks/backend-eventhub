@@ -2,6 +2,11 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"net/url"
+	"strconv"
+	"strings"
 
 	"github.com/fajarworks/backend-eventhub/internal/dto"
 	"github.com/fajarworks/backend-eventhub/internal/repository"
@@ -120,4 +125,82 @@ func (s *CommunityService) GetCommunitiesByUserId(ctx context.Context, userId in
 		})
 	}
 	return communities, nil
+}
+
+func (s *CommunityService) GetAllCommunities(ctx context.Context, qp dto.CommunitiesFilter, endpoint string) ([]dto.CommunitiesResponse, dto.CommunityPageMetaData, error) {
+	offset := (qp.Page - 1) * qp.Limit
+	qp.Search = strings.TrimSpace(qp.Search)
+
+	data, err := s.repo.GetAllCommunities(ctx, qp.Search, qp.CategoryID, qp.Limit, offset)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, dto.CommunityPageMetaData{}, err
+	}
+	var communities []dto.CommunitiesResponse
+	for _, v := range data {
+		communities = append(communities, dto.CommunitiesResponse{
+			ID:             v.ID,
+			Image:          v.Image,
+			Name:           v.Name,
+			Categories:     v.Categories,
+			Members:        v.Members,
+			UpcomingEvents: v.UpcomingEvents,
+		})
+	}
+	totalData, err := s.repo.GetTotalData(ctx, qp.Search, qp.CategoryID)
+	if err != nil {
+		return nil, dto.CommunityPageMetaData{}, err
+	}
+
+	totalPage := (totalData + qp.Limit - 1) / qp.Limit
+
+	var next, prev string
+	categoryID := 0
+	if qp.CategoryID != nil {
+		categoryID = *qp.CategoryID
+	}
+
+	if qp.Page < totalPage {
+		next = BuildPageURL(
+			endpoint,
+			qp.Search,
+			categoryID,
+			qp.Limit,
+			qp.Page+1,
+		)
+	}
+
+	if qp.Page > 1 && qp.Page <= totalPage {
+		prev = BuildPageURL(
+			endpoint,
+			qp.Search,
+			categoryID,
+			qp.Limit,
+			qp.Page-1,
+		)
+	}
+
+	meta := dto.CommunityPageMetaData{
+		Next:      next,
+		Prev:      prev,
+		TotalData: totalData,
+	}
+	return communities, meta, nil
+}
+
+func BuildPageURL(endPoint, search string, categoryID int, limit, page int) string {
+	q := url.Values{}
+	q.Set("page", strconv.Itoa(page))
+	q.Set("limit", strconv.Itoa(limit))
+
+	if search != "" {
+		q.Set("search", search)
+	}
+
+	if categoryID != 0 {
+		q.Set("category", strconv.Itoa(categoryID))
+	}
+
+	return fmt.Sprintf("%s?%s", endPoint, q.Encode())
+
 }

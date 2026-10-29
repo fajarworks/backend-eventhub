@@ -3,11 +3,12 @@ package dto
 import "time"
 
 type CommunityResponse struct {
-	ID          int      `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Categories  []string `json:"categories"`
-	Members     int      `json:"members"`
+	ID             int      `json:"id"`
+	Name           string   `json:"name"`
+	Description    string   `json:"description"`
+	Categories     []string `json:"categories"`
+	Members        int      `json:"members"`
+	UpcomingEvents int      `json:"upcoming_events"`
 }
 
 type CommunityMembers struct {
@@ -44,4 +45,17 @@ type CommunitiesResponse struct {
 	Categories     []string `json:"categories"`
 	Members        int      `json:"members"`
 	UpcomingEvents int      `json:"upcoming_event"`
+}
+
+type CommunitiesFilter struct {
+	Search     string
+	CategoryID *int
+	Page       int
+	Limit      int
+}
+
+type CommunityPageMetaData struct {
+	Next      string `json:"next"`
+	Prev      string `json:"prev"`
+	TotalData int    `json:"total_data"`
 }

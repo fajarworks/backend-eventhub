@@ -167,6 +167,47 @@ paths:
       summary: Register a new user
       tags:
       - Auth
+  /communities:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of communities with optional search and
+        category filters
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by category ID
+        in: query
+        name: category
+        type: integer
+      - description: Search community by name
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Communities retrieved successfully
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Get all communities
+      tags:
+      - Communities
   /communities/{id}/join:
     post:
       consumes:

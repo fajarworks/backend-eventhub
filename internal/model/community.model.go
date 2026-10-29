@@ -3,9 +3,13 @@ package model
 import "time"
 
 type Community struct {
-	ID          int    `db:"id"`
-	Name        string `db:"name"`
-	Description string `db:"description"`
+	ID             int      `db:"id"`
+	Name           string   `db:"name"`
+	Image          string   `db:"image"`
+	Description    string   `db:"description"`
+	Members        int      `db:"members"`
+	UpcomingEvents int      `db:"upcoming_events"`
+	Categories     []string `db:"categories"`
 }
 
 type CommunityMember struct {

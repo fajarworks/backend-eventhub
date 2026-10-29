@@ -33,6 +33,7 @@ func main() {
 		log.Println("can't connect to database :", err.Error())
 	}
 	defer pool.Close()
+	fmt.Println("connected to data base")
 
 	if err := pool.Ping(context.Background()); err != nil {
 		log.Println("database is not ready\n:", err.Error())
@@ -40,19 +41,17 @@ func main() {
 	rc := config.NewRedis(os.Getenv("REDIS_HOST"), os.Getenv("REDIS_USERNAME"), os.Getenv("REDIS_PASSWORD"), os.Getenv("REDIS_PORT"))
 	rdb := rc.Connect()
 	defer rdb.Close()
-	status := rdb.Ping(context.Background())
+	status, err := rdb.Ping(context.Background()).Result()
 
-	res, err := status.Result()
 	if err != nil {
-		fmt.Println("gagal connect redis : ", err)
-
+		fmt.Println("gagal connect redis", err)
 	}
-	fmt.Println(res)
+	fmt.Println(status)
+
 	fmt.Println("berhasil connect redis")
 
 	r := gin.Default()
 
 	router.MainRouter(r, pool, rdb)
-	fmt.Println("connected to data base")
 	r.Run(fmt.Sprintf("%s:%s", os.Getenv("SERVER_HOST"), os.Getenv("PORT")))
 }

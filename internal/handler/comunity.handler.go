@@ -245,3 +245,67 @@ func (h *CommunityHandler) GetCommunitiesByUserId(ctx *gin.Context) {
 		Message: "get communities by user id retrieved successfully",
 	})
 }
+
+// GetAllCommunities godoc
+// @Summary      Get all communities
+// @Description  Retrieve a paginated list of communities with optional search and category filters
+// @Tags         Communities
+// @Accept       json
+// @Produce      json
+// @Param        page      query     int     false  "Page number"
+// @Param        limit     query     int     false  "Items per page"
+// @Param        category  query     int     false  "Filter by category ID"
+// @Param        search    query     string  false  "Search community by name"
+// @Success      200  {object}  dto.Response  "Communities retrieved successfully"
+// @Failure      400  {object}  dto.Response  "Invalid query parameters"
+// @Failure      500  {object}  dto.Response  "Internal server error"
+// @Router       /communities [get]
+func (h *CommunityHandler) GetAllCommunities(ctx *gin.Context) {
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", "6"))
+	if err != nil || limit < 1 {
+		limit = 6
+	}
+	search := ctx.Query("search")
+	var categoryID *int
+
+	if category := ctx.Query("category"); category != "" {
+		id, err := strconv.Atoi(category)
+		if err != nil || id < 1 {
+			ctx.JSON(http.StatusBadRequest, dto.Response{
+				Success: false,
+				Message: "invalid category ID",
+			})
+			return
+		}
+
+		categoryID = &id
+	}
+	qp := dto.CommunitiesFilter{
+		Search:     search,
+		CategoryID: categoryID,
+		Page:       page,
+		Limit:      limit,
+	}
+	communites, meta, err := h.service.GetAllCommunities(ctx.Request.Context(), qp, ctx.Request.URL.Path)
+	if err != nil {
+		log.Println("err: ", err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Message: "an error server occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Data: gin.H{
+			"data": communites,
+			"meta": meta,
+		},
+		Message: "communities retrieved successfully",
+	})
+}

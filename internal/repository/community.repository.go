@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	apperror "github.com/fajarworks/backend-eventhub/internal/errror"
 	"github.com/fajarworks/backend-eventhub/internal/model"
@@ -194,4 +196,96 @@ func (r *CommunityRepo) GetCommunitiesByUserId(ctx context.Context, userId int) 
 		data = append(data, com)
 	}
 	return data, nil
+}
+
+func (r *CommunityRepo) GetAllCommunities(ctx context.Context, search string, categoryID *int, limit, offset int) ([]model.Community, error) {
+	var query strings.Builder
+	var args []any
+
+	query.WriteString(
+		`	SELECT 
+    com.id,
+    com.name,
+		com.image,
+    (
+        SELECT COUNT(*)
+        FROM user_community uc
+        WHERE uc.community_id = com.id
+    ) AS members,
+    (
+        SELECT array_agg(c.name)
+        FROM community_category cc
+        JOIN categories c ON c.id = cc.category_id
+        WHERE cc.community_id = com.id
+    ) AS categories,
+    (
+        SELECT COUNT(*)
+        FROM events e
+        WHERE e.community_id = com.id AND e.start_time >= now()
+    ) AS upcoming_events
+FROM communities com WHERE 1=1`)
+
+	if categoryID != nil {
+		args = append(args, *categoryID)
+		query.WriteString(fmt.Sprintf(`
+					AND EXISTS ( SELECT 1 FROM community_category cc
+						WHERE cc.community_id = com.id
+							AND cc.category_id = $%d)`, len(args)))
+	}
+
+	if search != "" {
+		args = append(args, "%"+search+"%")
+		query.WriteString(fmt.Sprintf(`
+				AND LOWER(com.name) LIKE LOWER($%d)`, len(args)))
+	}
+
+	args = append(args, limit)
+	query.WriteString(fmt.Sprintf(` LIMIT $%d`, len(args)))
+
+	args = append(args, offset)
+	query.WriteString(fmt.Sprintf(` OFFSET $%d`, len(args)))
+
+	rows, err := r.db.Query(ctx, query.String(), args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var communities []model.Community
+
+	for rows.Next() {
+		var com model.Community
+		if err := rows.Scan(&com.ID, &com.Name, &com.Image, &com.Members, &com.Categories, &com.UpcomingEvents); err != nil {
+			return nil, err
+
+		}
+		communities = append(communities, com)
+	}
+	return communities, nil
+}
+
+func (r *CommunityRepo) GetTotalData(ctx context.Context, search string, CategoryID *int) (int, error) {
+	var q strings.Builder
+	var args []any
+
+	q.WriteString(`SELECT COUNT(*) FROM communities c  WHERE 1=1`)
+	if CategoryID != nil {
+		args = append(args, *CategoryID)
+		q.WriteString(fmt.Sprintf(`
+		AND EXISTS (
+		SELECT 1 FROM community_category cc
+		WHERE cc.community_id = c.id AND
+		cc.category_id = $%d
+		)`, len(args)))
+
+	}
+	if search != "" {
+		args = append(args, "%"+search+"%")
+		q.WriteString(fmt.Sprintf(`
+		AND LOWER(c.name) LIKE LOWER($%d)`, len(args)))
+	}
+	var totalData int
+	if err := r.db.QueryRow(ctx, q.String(), args...).Scan(&totalData); err != nil {
+		return 0, err
+	}
+	return totalData, nil
 }
