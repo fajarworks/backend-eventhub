@@ -2,18 +2,22 @@ package service
 
 import (
 	"context"
+	"log"
 
 	"github.com/fajarworks/backend-eventhub/internal/dto"
 	"github.com/fajarworks/backend-eventhub/internal/repository"
+	"github.com/fajarworks/backend-eventhub/internal/sse"
 )
 
 type EventService struct {
-	repo *repository.EventRepo
+	repo   *repository.EventRepo
+	broker *sse.Broker
 }
 
-func NewEventService(repo *repository.EventRepo) *EventService {
+func NewEventService(repo *repository.EventRepo, broker *sse.Broker) *EventService {
 	return &EventService{
-		repo: repo,
+		repo:   repo,
+		broker: broker,
 	}
 }
 
@@ -63,32 +67,40 @@ func (s *EventService) GetEvents(ctx context.Context, categoryId int, location, 
 	return result, nil
 }
 
-// func (s *EventService) ToggleJoinEvent(ctx context.Context, userId, eventId int) (bool, error) {
-// 	joined, err := s.repo.IsJoinEvent(ctx, userId, eventId)
-// 	if err != nil {
-// 		return false, err
-// 	}
-
-// 	if joined {
-// 		if err := s.repo.LeaveEvent(ctx, userId, eventId); err != nil {
-// 			return false, err
-
-// 		}
-// 		return false, nil
-// 	}
-
-// 	if err := s.repo.JoinEvent(ctx, userId, eventId); err != nil {
-// 		return false, err
-// 	}
-// 	return true, nil
-// }
+func (s *EventService) GetEventAttendees(ctx context.Context, eventId int) (int, error) {
+	attendees, err := s.repo.GetEventAttendees(ctx, eventId)
+	if err != nil {
+		return 0, err
+	}
+	return attendees, nil
+}
 
 func (s *EventService) JoinEvent(ctx context.Context, userId, eventId int) error {
-	return s.repo.JoinEvent(ctx, userId, eventId)
+	if err := s.JoinEvent(ctx, userId, eventId); err != nil {
+		return err
+	}
+	count, err := s.repo.GetEventAttendees(ctx, eventId)
+	if err != nil {
+		log.Printf("failed to get attendee count : %v", err)
+		return err
+	}
+
+	s.broker.Publish(eventId, count)
+	return nil
 }
 
 func (s *EventService) LeaveEvent(ctx context.Context, userId, eventId int) error {
-	return s.repo.LeaveEvent(ctx, userId, eventId)
+	if err := s.repo.LeaveEvent(ctx, userId, eventId); err != nil {
+		return err
+	}
+
+	count, err := s.repo.GetEventAttendees(ctx, eventId)
+	if err != nil {
+		log.Printf("failed to get attendee count : %v", err)
+		return err
+	}
+	s.broker.Publish(eventId, count)
+	return nil
 }
 
 func (s *EventService) GetDetail(ctx context.Context, eventId int) (dto.EventResponse, error) {

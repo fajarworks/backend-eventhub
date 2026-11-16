@@ -5,16 +5,18 @@ import (
 	"github.com/fajarworks/backend-eventhub/internal/middleware"
 	"github.com/fajarworks/backend-eventhub/internal/repository"
 	"github.com/fajarworks/backend-eventhub/internal/service"
+	"github.com/fajarworks/backend-eventhub/internal/sse"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 )
 
 func EventRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
+	broker := sse.NewBroker()
 	eventRouter := r.Group("/events")
 	eventRepo := repository.NewEventRepo(db)
-	eventService := service.NewEventService(eventRepo)
-	eventHandler := handler.NewEventHandler(eventService)
+	eventService := service.NewEventService(eventRepo, broker)
+	eventHandler := handler.NewEventHandler(eventService, broker)
 
 	eventRouter.GET("", eventHandler.GetEvents)
 	eventRouter.GET("/:id", eventHandler.GetEventDetail)
@@ -26,5 +28,6 @@ func EventRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 	eventRouter.DELETE("/:id/remove", middleware.AuthMiddleware(rdb), eventHandler.RemoveSavedEvent)
 	eventRouter.GET("/join", middleware.AuthMiddleware(rdb), eventHandler.GetJoinedEventIds)
 	eventRouter.GET("/save", middleware.AuthMiddleware(rdb), eventHandler.GetSavedEventIds)
+	eventRouter.GET("/:id/attendees/stream", eventHandler.StreamAttendees)
 
 }

@@ -1,22 +1,27 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/fajarworks/backend-eventhub/internal/dto"
 	"github.com/fajarworks/backend-eventhub/internal/service"
+	"github.com/fajarworks/backend-eventhub/internal/sse"
 	"github.com/gin-gonic/gin"
 )
 
 type EventHandler struct {
 	service *service.EventService
+	broker  *sse.Broker
 }
 
-func NewEventHandler(service *service.EventService) *EventHandler {
+func NewEventHandler(service *service.EventService, broker *sse.Broker) *EventHandler {
 	return &EventHandler{
 		service: service,
+		broker:  broker,
 	}
 }
 
@@ -46,48 +51,57 @@ func (h *EventHandler) GetEvents(ctx *gin.Context) {
 	})
 }
 
-// func (h *EventHandler) ToggleJoinEvent(ctx *gin.Context) {
-// 	userId, exist := ctx.Get("userId")
-// 	if !exist {
-// 		ctx.JSON(http.StatusUnauthorized, dto.Response{
-// 			Success: false,
-// 			Message: "unauthorized",
-// 		})
-// 		return
-// 	}
-// 	eventId, err := strconv.Atoi(ctx.Param("id"))
-// 	if err != nil {
-// 		ctx.JSON(http.StatusBadRequest, dto.Response{
-// 			Success: false,
-// 			Message: "invalid event id",
-// 		})
-// 		return
-// 	}
-// 	isJoined, err := h.service.ToggleJoinEvent(ctx.Request.Context(), userId.(int), eventId)
-// 	if err != nil {
-// 		log.Println(err.Error())
-// 		ctx.JSON(http.StatusInternalServerError, dto.Response{
-// 			Success: false,
-// 			Message: "server error occured",
-// 		})
-// 		return
+func (h *EventHandler) StreamAttendees(ctx *gin.Context) {
+	eventId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusBadRequest, dto.Response{
+			Success: false,
+			Data:    nil,
+			Message: "invalid event id",
+		})
+		return
+	}
+	attendees, err := h.service.GetEventAttendees(ctx.Request.Context(), eventId)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Message: "an error server occured",
+		})
+		return
+	}
+	w := ctx.Writer
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Chace-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("X-Accel-Buffering", "no")
 
-// 	}
+	ch := h.broker.Subscribe(eventId)
+	defer h.broker.Unsubscribe(eventId, ch)
 
-// 	message := "user left event successfully"
-// 	if isJoined {
-// 		message = "user join event successfully"
-// 	}
+	send := func(count int) {
+		fmt.Fprintf(w, "event: attendees\ndata: {\"count\":%d}\n\n", count)
+		w.Flush()
+	}
+	send(attendees)
+	ticker := time.NewTicker(25 * time.Second)
+	defer ticker.Stop()
 
-// 	ctx.JSON(http.StatusOK, dto.Response{
-// 		Success: true,
-// 		Data: gin.H{
-// 			"is_Joined": isJoined,
-// 		},
-// 		Message: message,
-// 	})
+	for {
+		select {
+		case <-ctx.Request.Context().Done():
+			return
+		case count := <-ch:
+			send(count)
+		case <-ticker.C:
+			fmt.Fprint(w, ": ping \n\n")
+			w.Flush()
+		}
 
-// }
+	}
+
+}
 
 func (h *EventHandler) JoinEvent(ctx *gin.Context) {
 	userId, _ := ctx.Get("userId")
