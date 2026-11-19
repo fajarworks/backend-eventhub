@@ -76,7 +76,8 @@ func (s *EventService) GetEventAttendees(ctx context.Context, eventId int) (int,
 }
 
 func (s *EventService) JoinEvent(ctx context.Context, userId, eventId int) error {
-	if err := s.JoinEvent(ctx, userId, eventId); err != nil {
+
+	if err := s.repo.JoinEvent(ctx, userId, eventId); err != nil {
 		return err
 	}
 	count, err := s.repo.GetEventAttendees(ctx, eventId)
