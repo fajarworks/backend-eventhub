@@ -73,7 +73,7 @@ func (h *EventHandler) StreamAttendees(ctx *gin.Context) {
 	}
 	w := ctx.Writer
 	w.Header().Set("Content-Type", "text/event-stream")
-	w.Header().Set("Chace-Control", "no-cache")
+	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("X-Accel-Buffering", "no")
 
