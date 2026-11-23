@@ -22,9 +22,9 @@ func NewCommunityRepo(db *pgxpool.Pool) *CommunityRepo {
 }
 
 func (r *CommunityRepo) GetDetailCommunity(ctx context.Context, comId int) (model.Community, error) {
-	sql := `SELECT id, name, description FROM communities WHERE id = $1`
+	sql := `SELECT id, name, image, description FROM communities WHERE id = $1`
 	var community model.Community
-	err := r.db.QueryRow(ctx, sql, comId).Scan(&community.ID, &community.Name, &community.Description)
+	err := r.db.QueryRow(ctx, sql, comId).Scan(&community.ID, &community.Name, &community.Image, &community.Description)
 	if err != nil {
 		return model.Community{}, err
 	}

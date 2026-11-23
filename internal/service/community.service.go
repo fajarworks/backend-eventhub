@@ -39,11 +39,13 @@ func (s *CommunityService) GetDetailCommunity(ctx context.Context, comId int) (d
 	}
 
 	return dto.CommunityResponse{
-		ID:          comId,
-		Name:        com.Name,
-		Description: com.Description,
-		Categories:  categories,
-		Members:     members,
+		ID:             comId,
+		Name:           com.Name,
+		Description:    com.Description,
+		Categories:     categories,
+		Members:        members,
+		Image:          com.Image,
+		UpcomingEvents: 0,
 	}, err
 
 }

@@ -5,6 +5,7 @@ import "time"
 type CommunityResponse struct {
 	ID             int      `json:"id"`
 	Name           string   `json:"name"`
+	Image          string   `json:"image"`
 	Description    string   `json:"description"`
 	Categories     []string `json:"categories"`
 	Members        int      `json:"members"`
