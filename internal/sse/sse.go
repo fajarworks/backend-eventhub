@@ -21,8 +21,8 @@ func (b *Broker) Subscribe(eventId int) chan int {
 
 	if b.subs[eventId] == nil {
 		b.subs[eventId] = make(map[chan int]struct{})
-		b.subs[eventId][ch] = struct{}{}
 	}
+	b.subs[eventId][ch] = struct{}{}
 	return ch
 
 }
