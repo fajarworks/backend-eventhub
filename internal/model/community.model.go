@@ -13,10 +13,10 @@ type Community struct {
 }
 
 type CommunityMember struct {
-	ID           int    `db:"id"`
-	FullName     string `db:"fullname"`
-	PhotoProfile string `db:"photo_profile"`
-	JobPosition  string `db:"job_position"`
+	ID           int     `db:"id"`
+	FullName     string  `db:"fullname"`
+	PhotoProfile *string `db:"photo_profile"`
+	JobPosition  *string `db:"job_position"`
 }
 
 type PopularCommunities struct {

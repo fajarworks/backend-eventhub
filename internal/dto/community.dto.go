@@ -13,10 +13,10 @@ type CommunityResponse struct {
 }
 
 type CommunityMembers struct {
-	ID           int    `json:"id"`
-	Name         string `json:"name"`
-	PhotoProfile string `json:"photo_profile"`
-	JobPosition  string `json:"job_position"`
+	ID           int     `json:"id"`
+	Name         string  `json:"name"`
+	PhotoProfile *string `json:"photo_profile"`
+	JobPosition  *string `json:"job_position"`
 }
 
 type PopularCommunities struct {
