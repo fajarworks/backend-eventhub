@@ -266,9 +266,9 @@ func (h *CommunityHandler) GetAllCommunities(ctx *gin.Context) {
 		page = 1
 	}
 
-	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", "6"))
+	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", "8"))
 	if err != nil || limit < 1 {
-		limit = 6
+		limit = 8
 	}
 	search := ctx.Query("search")
 	var categoryID *int
