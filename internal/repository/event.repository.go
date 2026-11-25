@@ -333,3 +333,23 @@ func (r *EventRepo) GetSavedEventIds(ctx context.Context, userId int) ([]int, er
 	}
 	return eventIds, nil
 }
+
+func (r *EventRepo) GetEventsByCommunityId(ctx context.Context, CommunityId int) ([]model.Event, error) {
+	sql := `SELECT e.id, e.title, e.image, e.location, e.capacity, e.start_time
+		FROM events e WHERE community_id = $1`
+	rows, err := r.db.Query(ctx, sql, CommunityId)
+	if err != nil {
+		return nil, err
+	}
+	var events []model.Event
+	var event model.Event
+	for rows.Next() {
+		err := rows.Scan(&event.ID, &event.Title, &event.Image, &event.Location, &event.Capacity, &event.StartTime)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+	fmt.Println(events)
+	return events, nil
+}

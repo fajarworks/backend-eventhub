@@ -381,3 +381,31 @@ func (h *EventHandler) GetSavedEventIds(ctx *gin.Context) {
 		Message: "success get joined event Ids",
 	})
 }
+
+func (h *EventHandler) GetEventsByCommunityId(ctx *gin.Context) {
+	comId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusBadRequest, dto.Response{
+			Success: false,
+			Data:    nil,
+			Message: "invalid id",
+		})
+		return
+	}
+	events, err := h.service.GetEventsByCommunityId(ctx, comId)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
+			Success: false,
+			Data:    nil,
+			Message: "an error server occured",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Response{
+		Success: true,
+		Data:    events,
+		Message: "events retrieved successfully",
+	})
+}

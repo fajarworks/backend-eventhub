@@ -29,5 +29,6 @@ func EventRouter(r *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 	eventRouter.GET("/join", middleware.AuthMiddleware(rdb), eventHandler.GetJoinedEventIds)
 	eventRouter.GET("/save", middleware.AuthMiddleware(rdb), eventHandler.GetSavedEventIds)
 	eventRouter.GET("/:id/attendees/stream", eventHandler.StreamAttendees)
+	eventRouter.GET("/communities/:id", eventHandler.GetEventsByCommunityId)
 
 }

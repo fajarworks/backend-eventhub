@@ -221,3 +221,32 @@ func (s *EventService) GetJoinedEventIds(ctx context.Context, userId int) ([]int
 func (s *EventService) GetSavedEventIds(ctx context.Context, userId int) ([]int, error) {
 	return s.repo.GetSavedEventIds(ctx, userId)
 }
+
+func (s *EventService) GetEventsByCommunityId(ctx context.Context, communityId int) ([]dto.EventResponse, error) {
+	events, err := s.repo.GetEventsByCommunityId(ctx, communityId)
+	if err != nil {
+		return nil, err
+	}
+	data := make([]dto.EventResponse, 0, len(events))
+	for _, v := range events {
+		categories, err := s.repo.GetCategoriesByEventId(ctx, v.ID)
+		if err != nil {
+			return nil, err
+		}
+		attendees, err := s.repo.GetEventAttendees(ctx, v.ID)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, dto.EventResponse{
+			ID:         v.ID,
+			Title:      v.Title,
+			Image:      v.Image,
+			Location:   v.Location,
+			Capacity:   v.Capacity,
+			StartTime:  v.StartTime,
+			Categories: categories,
+			Attendees:  attendees,
+		})
+	}
+	return data, nil
+}
